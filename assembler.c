@@ -197,14 +197,14 @@ void checkValid(int cmdNum, char* cmdParams, int emptyParams, int line){
         case 4: ;
             char* fpointer;
             float numFloat = strtof(cmdParams, &fpointer);
-            if(fpointer != NULL){
+            if(fpointer[0] != '\0'){
                 EXIT_ERROR(line);
             }
             break;
         case 5: ;
             char* dpointer;
             double numDouble = strtod(cmdParams, &dpointer);
-            if(dpointer != NULL){
+            if(dpointer[0] != '\0'){
                 EXIT_ERROR(line);
             }
             break;
