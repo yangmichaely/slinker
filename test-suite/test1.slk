@@ -1,0 +1,10 @@
+.code
+	pushb 34
+	pushi 48
+	dupi
+	addi
+	outi
+	popi
+	halt
+; This program should print 96
+; end of the program
