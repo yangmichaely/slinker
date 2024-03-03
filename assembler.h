@@ -57,6 +57,6 @@ void checkValid(int cmdNum, char* cmdParams, int emptyParams, int line);
 
 void read(FILE* fp, char* outFile);
 
-int splitter(char* cmdParams, uint8_t cmdNum, FILE* out);
+void splitter(char* cmdParams, uint8_t cmdNum, FILE* out);
 
 #endif
