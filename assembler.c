@@ -9,7 +9,8 @@
 #include <float.h>
 
 int lines;
-int dataStart;
+uint32_t dataStart;
+uint32_t codeStart;
 
 int main(int argc, char** argv){
     FILE* fp = fopen(argv[1], "r\0");
@@ -531,9 +532,6 @@ void firstPass(FILE* fp){
 
 void readCode(FILE* fp, FILE* out){
     rewind(fp);
-    rewind(out);
-    int codeStart = 8;
-    fwrite(&codeStart, sizeof(codeStart), 1, out);
     fseek(out, 8, SEEK_SET);
     //code, data, byte, ascii, short, int, long, float, double
     int codeOrData = 1;
@@ -576,8 +574,11 @@ void readCode(FILE* fp, FILE* out){
         }
         free(buffer);
     }
-    dataStart = ftell(out);
-    fseek(out, 4, SEEK_SET);
+    dataStart = ftell(out) << 24;
+    codeStart = 8 << 24;
+    printf("%d\n", dataStart);
+    rewind(out);
+    fwrite(&codeStart, sizeof(codeStart), 1, out);
     fwrite(&dataStart, sizeof(dataStart), 1, out);
 }
 
