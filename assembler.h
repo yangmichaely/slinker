@@ -31,7 +31,7 @@ addr* listHead = NULL;
 
 void insert(char* name, int address, int nameLength);
 
-int search(char* name, int line);
+int search(char* name);
 
 void freeList(addr* head);
 
@@ -47,7 +47,7 @@ void intCheck(int num, int line);
 
 void longCheck(long long num, int line);
 
-void twentyFourCheck(long num, int line);
+int twentyFourCheck(long num);
 
 int searchCMD(char* cmdName, int line);
 
@@ -59,6 +59,6 @@ void readCode(FILE* fp, FILE* out);
 
 void readData(FILE* fp, FILE* out);
 
-void splitter(char* cmdParams, uint8_t cmdNum, FILE* out);
+int splitter(char* cmdParams, uint8_t cmdNum, FILE* out);
 
 #endif

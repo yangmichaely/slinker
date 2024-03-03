@@ -1,12 +1,12 @@
 .code
 	pushdm :N0
-	pushdm :NO+8
+	pushdm :N0+8
 	addd
 	outd
 	halt
 .data
 .double
-:NO
+:N0
 	32.4
 	14.3
 ; This program should print 46.7

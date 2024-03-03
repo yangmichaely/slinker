@@ -59,7 +59,7 @@ void insert(char* name, int address, int nameLength){
     }
 }
 
-int search(char* name, int line){
+int search(char* name){
     addr *temp = listHead;
     while(temp != NULL) {
         if (strcmp(temp -> name, name) == 0) {
@@ -67,7 +67,7 @@ int search(char* name, int line){
         }
         temp=temp->next;
     }
-    EXIT_ERROR(line + 1);
+    return -1;
 }
 
 void freeList(addr* listHead){
@@ -95,37 +95,37 @@ void displayList() {
 }
 
 void EXIT_ERROR(int line){
-    fprintf(stderr, "%s%d\n", "Error on line ", line);
+    fprintf(stderr, "%s%d\n", "Error on line ", line + 1);
     exit(1);
 }
 
 void byteCheck(int num, int line){
     if(num < -128 || num > 127){
-        EXIT_ERROR(line + 1);
+        EXIT_ERROR(line);
     }
 }
 
 void shortCheck(int num, int line){
     if(num < -128 || num > 127){
-        EXIT_ERROR(line + 1);
+        EXIT_ERROR(line);
     }
 }
 
 void intCheck(int num, int line){
     if(num < -128 || num > 127){
-        EXIT_ERROR(line + 1);
+        EXIT_ERROR(line);
     }
 }
 
 void longCheck(long long num, int line){
     if(num < LONG_MIN || num > LONG_MAX){
-        EXIT_ERROR(line + 1);
+        EXIT_ERROR(line);
     }
 }
 
-void twentyFourCheck(long num, int line){
+int twentyFourCheck(long num){
     if(num < 0 || num > 16777215){
-        EXIT_ERROR(line + 1);
+        return -1;
     }
 }
 
@@ -138,7 +138,7 @@ void checkValid(int cmdNum, char* cmdParams, int emptyParams, int line){
         case 133:
         case 141 ... 142:
             if(emptyParams == 0){
-                EXIT_ERROR(line + 1);
+                EXIT_ERROR(line);
             }
             break;
         //SHFT, PUSHB, JRPC
@@ -153,7 +153,7 @@ void checkValid(int cmdNum, char* cmdParams, int emptyParams, int line){
             }
             else{
                 regfree(&regex);
-                EXIT_ERROR(line + 1);
+                EXIT_ERROR(line);
             }
             break;
         case 1:
@@ -165,7 +165,7 @@ void checkValid(int cmdNum, char* cmdParams, int emptyParams, int line){
             }
             else{
                 regfree(&regex);
-                EXIT_ERROR(line + 1);
+                EXIT_ERROR(line);
             }
             break;
         case 2:
@@ -177,7 +177,7 @@ void checkValid(int cmdNum, char* cmdParams, int emptyParams, int line){
             }
             else{
                 regfree(&regex);
-                EXIT_ERROR(line + 1);
+                EXIT_ERROR(line);
             }
             break;
         case 3:
@@ -189,19 +189,19 @@ void checkValid(int cmdNum, char* cmdParams, int emptyParams, int line){
             }
             else{
                 regfree(&regex);
-                EXIT_ERROR(line + 1);
+                EXIT_ERROR(line);
             }
             break;
         case 4: ;
             float numFloat = strtof(cmdParams, &ptr);
             if(ptr != "\0"){
-                EXIT_ERROR(line + 1);
+                EXIT_ERROR(line);
             }
             break;
         case 5: ;
             double numDouble = strtod(cmdParams, &ptr);
             if(ptr != "\0"){
-                EXIT_ERROR(line + 1);
+                EXIT_ERROR(line);
             }
             break;
         //POP, PUSH, JMP, JZ...etc, CALL memory cases
@@ -210,30 +210,9 @@ void checkValid(int cmdNum, char* cmdParams, int emptyParams, int line){
         case 131:
         case 134 ... 140:
             regcomp(&regex, VALID_PARAMETERS[2], REG_EXTENDED);
-            if(regexec(&regex, cmdParams, 0, NULL, 0) == 0){
+            if(regexec(&regex, cmdParams, 0, NULL, 0) != 0){
                 regfree(&regex);
-                if(strchr(cmdParams, '+') != NULL){
-                    char* add = strchr(cmdParams, '+');
-                    char* addr = strtok(cmdParams, "+");
-                    long addNum = atol(add);
-                    int addrNum = search(addr, line);
-                    twentyFourCheck(addrNum + addNum, line);
-                }
-                else if(strchr(cmdParams, '-') != NULL){
-                    char* add = strchr(cmdParams, '-');
-                    char* addr = strtok(cmdParams, "-");
-                    long addNum = atol(add);
-                    int addrNum = search(addr, line);
-                    twentyFourCheck(addrNum + addNum, line);
-                }
-                else{
-                    long addrNum = atol(cmdParams);
-                    twentyFourCheck(addrNum, line);
-                }
-            }
-            else{
-                regfree(&regex);
-                EXIT_ERROR(line + 1);
+                EXIT_ERROR(line);
             }
             break;
         //PUSHMM, POPMM
@@ -253,34 +232,16 @@ void checkValid(int cmdNum, char* cmdParams, int emptyParams, int line){
                 for(; i < strlen(cmdParams); i++){
                     param2[j++] = cmdParams[i];
                 }
-                if(strchr(param1, '+') != NULL){
-                    char* add = strchr(param1, '+');
-                    char* addr = strtok(param1, "+");
-                    long addNum = atol(add);
-                    int addrNum = search(addr, line);
-                    twentyFourCheck(addrNum + addNum, line);
-                }
-                else if(strchr(param1, '-') != NULL){
-                    char* add = strchr(param1, '-');
-                    char* addr = strtok(param1, "-");
-                    long addNum = atol(add);
-                    int addrNum = search(addr, line);
-                    twentyFourCheck(addrNum + addNum, line);
-                }
-                else{
-                    long addrNum = atol(cmdParams);
-                    twentyFourCheck(addrNum, line);
-                }
                 int num = atol(param2);
                 byteCheck(num, line);
             }
             else{
                 regfree(&regex);
-                EXIT_ERROR(line + 1);
+                EXIT_ERROR(line);
             }
             break;
         default:
-            EXIT_ERROR(line + 1);
+            EXIT_ERROR(line);
             break;
     }
 }
@@ -291,7 +252,7 @@ int checkDigits(char* num, int line){
     }
     for (int j = 1; j < strlen(num); j++){
         if (!isdigit(num[j])){
-            EXIT_ERROR(line + 1);
+            EXIT_ERROR(line);
         }
     }
 }
@@ -302,7 +263,7 @@ int searchCMD(char* cmdName, int line){
             return j;
         }
     }
-    EXIT_ERROR(line + 1);
+    EXIT_ERROR(line);
 }
 
 void firstPass(FILE* fp){
@@ -355,7 +316,7 @@ void firstPass(FILE* fp){
                 directives = 6;
             }
             else{
-                EXIT_ERROR(i + 1);
+                EXIT_ERROR(i);
             }
         }
         else if(c == '\t'){
@@ -425,7 +386,7 @@ void firstPass(FILE* fp){
                             codeMem += 4;
                             break;
                         default:
-                            EXIT_ERROR(i + 1);
+                            EXIT_ERROR(i);
                             break;
                     }
                 }
@@ -433,7 +394,7 @@ void firstPass(FILE* fp){
                     codeMem++;
                 }
                 else{
-                    EXIT_ERROR(i + 1);
+                    EXIT_ERROR(i);
                 }
                 free(cmdName);
                 free(cmdParams);
@@ -443,14 +404,14 @@ void firstPass(FILE* fp){
                 checkDigits(buff, i);
                 int dataVal = atoi(buff);
                 if(dataVal < -128 || dataVal > 127){
-                    EXIT_ERROR(i + 1);
+                    EXIT_ERROR(i);
                 }
                 dataMem++;
             }
             else if(codeOrData == 1 && directives == 1){
                 //TODO: Verify ascii check
                 if(strlen(buffer) != 2){
-                    EXIT_ERROR(i + 1);
+                    EXIT_ERROR(i);
                 }
                 dataMem++;
             }
@@ -458,7 +419,7 @@ void firstPass(FILE* fp){
                 checkDigits(buff, i);
                 int dataVal = atoi(buff);
                 if(dataVal < -32768 || dataVal > 32767){
-                    EXIT_ERROR(i + 1);
+                    EXIT_ERROR(i);
                 }
                 dataMem += 2;
             }
@@ -466,7 +427,7 @@ void firstPass(FILE* fp){
                 checkDigits(buff, i);
                 int dataVal = atoi(buff);
                 if(dataVal < -2147483648 || dataVal > 2147483647){
-                    EXIT_ERROR(i + 1);
+                    EXIT_ERROR(i);
                 }
                 dataMem += 4;
             }
@@ -477,7 +438,7 @@ void firstPass(FILE* fp){
                 char *ptr;
                 int64_t dataVal = strtoul(buff, &ptr, 10);
                 if(dataVal == max && strcmp(buff, "9223372036854775807") != 0){
-                    EXIT_ERROR(i + 1);
+                    EXIT_ERROR(i);
                 }
                 dataMem += 8;
             }
@@ -486,7 +447,7 @@ void firstPass(FILE* fp){
                 char* fptr;
                 float value = strtof(buff, &fptr);
                 if(fptr[0] != '\0'){
-                    EXIT_ERROR(i + 1);
+                    EXIT_ERROR(i);
                 }
                 dataMem += 4;
             }
@@ -494,22 +455,25 @@ void firstPass(FILE* fp){
                 char* dptr;
                 double value = strtod(buff, &dptr);
                 if(dptr[0] != '\0'){
-                    EXIT_ERROR(i + 1);
+                    EXIT_ERROR(i);
                 }
                 dataMem += 8;
             }
             else{
-                EXIT_ERROR(i + 1);
+                EXIT_ERROR(i);
             }
         }
         //TODO: make sure the labels are correctly parsed
         else if(c == ':'){
             char* name = strtok(buffer, ":");
-            int found = search(name, -1);
+            int found = search(name);
+            if(found != -1){
+                EXIT_ERROR(i);
+            }
             regex_t regex;
             regcomp(&regex, VALID_PARAMETERS[0], REG_EXTENDED);
             if(strlen(name) > 255 || regexec(&regex, name, 0, NULL, 0) != 0){
-                EXIT_ERROR(i + 1);
+                EXIT_ERROR(i);
             }
             regfree(&regex);
             if(codeOrData == 0){
@@ -520,13 +484,13 @@ void firstPass(FILE* fp){
             }
         }
         else if(c != ';'){
-            EXIT_ERROR(i + 1);
+            EXIT_ERROR(i);
         }
         free(buffer);
     }
     fseek(fp, -1, SEEK_END);
     if(getc(fp) != '\n'){
-        EXIT_ERROR(lines + 1);
+        EXIT_ERROR(lines);
     }
 }
 
@@ -566,7 +530,9 @@ void readCode(FILE* fp, FILE* out){
                 }
                 fwrite(&cmdNum, sizeof(cmdNum), 1, out);
                 if(emptyParams == 0){
-                    splitter(cmdParams, cmdNum, out);
+                    if(splitter(cmdParams, cmdNum, out) == -1){
+                        EXIT_ERROR(i);
+                    }
                 }
                 free(cmdName);
                 free(cmdParams);
@@ -576,13 +542,12 @@ void readCode(FILE* fp, FILE* out){
     }
     dataStart = ftell(out) << 24;
     codeStart = 8 << 24;
-    printf("%d\n", dataStart);
     rewind(out);
     fwrite(&codeStart, sizeof(codeStart), 1, out);
     fwrite(&dataStart, sizeof(dataStart), 1, out);
 }
 
-void splitter(char* cmdParams, uint8_t cmdNum, FILE* out){
+int splitter(char* cmdParams, uint8_t cmdNum, FILE* out){
     //TODO: Figure out splitter
     //TODO: Handle commands with params
     switch(cmdNum){
@@ -633,23 +598,37 @@ void splitter(char* cmdParams, uint8_t cmdNum, FILE* out){
         case 25 ... 30:
         case 134 ... 140: ;
             uint32_t address = 0;
-            if(strchr(cmdParams, '+') != NULL){
+            if(cmdParams[0] == ':'){
+                char* addr = (char*) calloc(sizeof(char) * 255, 1);
+                for(int i = 1; i < strlen(cmdParams) && cmdParams[i] != '\0' && cmdParams[i] != '+' && cmdParams[i] != '-'; i++){
+                    addr[i - 1] = cmdParams[i];
+                }
+                int addrNum = search(addr);
+                if(addrNum == -1){
+                    return -1;
+                }
+                long addNum = 0;
                 char* add = strchr(cmdParams, '+');
-                char* addr = strtok(cmdParams, "+");
-                long addNum = atol(add);
-                int addrNum = search(addr, -1);
-                address = addrNum + addNum;
-            }
-            else if(strchr(cmdParams, '-') != NULL){
-                char* add = strchr(cmdParams, '-');
-                char* addr = strtok(cmdParams, "-");
-                long addNum = atol(add);
-                int addrNum = search(addr, -1);
+                char* subtract = strchr(cmdParams, '-');
+                if(add != NULL){
+                    addNum = atol(add);
+                }
+                else if(subtract != NULL){
+                    addNum = atol(subtract);
+                }
+                int boundsCheck = twentyFourCheck(addrNum + addNum);
+                if(boundsCheck == -1){
+                    return -1;
+                }
                 address = addrNum + addNum;
             }
             else{
-                char* ptr;
-                address = strtoul(cmdParams, &ptr, 10);
+                long addrNum = atol(cmdParams);
+                int boundsCheck = twentyFourCheck(addrNum);
+                if(boundsCheck == -1){
+                    return -1;
+                }
+                address = addrNum;
             }
             for(int i = 2; i >= 0; i--){
                 int8_t byteNum = address >> (i * 8) & 0xff;
@@ -670,23 +649,37 @@ void splitter(char* cmdParams, uint8_t cmdNum, FILE* out){
                 param2[j++] = cmdParams[i];
             }
             uint32_t addressNum = 0;
-            if(strchr(param1, '+') != NULL){
-                char* add = strchr(param1, '+');
-                char* addr = strtok(param1, "+");
-                long addNum = atol(add);
-                int addrNum = search(addr, -1);
-                addressNum = addrNum + addNum;
-            }
-            else if(strchr(param1, '-') != NULL){
-                char* add = strchr(param1, '-');
-                char* addr = strtok(param1, "-");
-                long addNum = atol(add);
-                int addrNum = search(addr, -1);
+            if(param1[0] == ':'){
+                char* addr = (char*) calloc(sizeof(char) * 255, 1);
+                for(int i = 1; i < strlen(param1) && param1[i] != '\0' && param1[i] != '+' && param1[i] != '-'; i++){
+                    addr[i - 1] = param1[i];
+                }
+                int addrNum = search(addr);
+                if(addrNum == -1){
+                    return -1;
+                }
+                long addNum = 0;
+                char* add = strchr(cmdParams, '+');
+                char* subtract = strchr(cmdParams, '-');
+                if(add != NULL){
+                    addNum = atol(add);
+                }
+                else if(subtract != NULL){
+                    addNum = atol(subtract);
+                }
+                int boundsCheck = twentyFourCheck(addrNum + addNum);
+                if(boundsCheck == -1){
+                    return -1;
+                }
                 addressNum = addrNum + addNum;
             }
             else{
-                char* ptr;
-                addressNum = strtoul(param1, &ptr, 10);
+                long addrNum = atol(param1);
+                int boundsCheck = twentyFourCheck(addrNum);
+                if(boundsCheck == -1){
+                    return -1;
+                }
+                addressNum = addrNum;
             }
             for(int i = 2; i >= 0; i--){
                 int8_t byteNum = addressNum >> (i * 8) & 0xff;
@@ -702,7 +695,7 @@ void splitter(char* cmdParams, uint8_t cmdNum, FILE* out){
 }
 
 void readData(FILE* fp, FILE* out){
-    fseek(out, dataStart, SEEK_SET);
+    fseek(out, dataStart >> 24, SEEK_SET);
     rewind(fp);
     //code, data, byte, ascii, short, int, long, float, double
     int codeOrData = 1;
