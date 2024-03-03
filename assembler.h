@@ -55,7 +55,7 @@ void firstPass(FILE* fp);
 
 void checkValid(int cmdNum, char* cmdParams, int emptyParams, int line);
 
-void readCode(FILE* fp, FILE* out);
+void readCode(FILE* fp, FILE* out, char* outfile);
 
 void readData(FILE* fp, FILE* out);
 

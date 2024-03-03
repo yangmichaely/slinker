@@ -35,7 +35,7 @@ int main(int argc, char** argv){
     outFile[strlen(argv[1])] = 'o';
     outFile[strlen(argv[1]) + 1] = '\0';
     FILE* out = fopen(outFile, "wb");
-    readCode(fp, out);
+    readCode(fp, out, outFile);
     readData(fp, out);
     exit(0);
 }
@@ -494,7 +494,7 @@ void firstPass(FILE* fp){
     }
 }
 
-void readCode(FILE* fp, FILE* out){
+void readCode(FILE* fp, FILE* out, char* outfile){
     rewind(fp);
     fseek(out, 8, SEEK_SET);
     //code, data, byte, ascii, short, int, long, float, double
@@ -531,6 +531,7 @@ void readCode(FILE* fp, FILE* out){
                 fwrite(&cmdNum, sizeof(cmdNum), 1, out);
                 if(emptyParams == 0){
                     if(splitter(cmdParams, cmdNum, out) == -1){
+                        remove(outfile);
                         EXIT_ERROR(i);
                     }
                 }
