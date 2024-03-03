@@ -32,7 +32,9 @@ int main(int argc, char** argv){
     }
     outFile[strlen(argv[1])] = 'o';
     outFile[strlen(argv[1]) + 1] = '\0';
-    read(fp, outFile);
+    FILE* out = fopen(outFile, "wb");
+    readCode(fp, out);
+    readData(fp, out);
     exit(0);
 }
 
@@ -176,7 +178,6 @@ void checkValid(int cmdNum, char* cmdParams, int emptyParams, int line){
                 EXIT_ERROR(line + 1);
             }
             break;
-            
         case 3:
             regcomp(&regex, VALID_PARAMETERS[1], REG_EXTENDED);
             if(regexec(&regex, cmdParams, 0, NULL, 0) == 0){
@@ -315,7 +316,8 @@ void firstPass(FILE* fp){
     int codeOrData = 1;
     int directives = 0;
     int emptyParams = 0;
-    int mem = 0;
+    int codeMem = 0;
+    int dataMem = 0;
     for(int i = 0; i < lines; i++){
         char* buffer = (char*) calloc (512 * sizeof(char), 1);
         fgets(buffer, 512, fp);
@@ -376,49 +378,49 @@ void firstPass(FILE* fp){
                     switch(cmdNum){
                         //PUSH CASES
                         case 0:
-                            mem += 2;
+                            codeMem += 2;
                             break;
                         case 1:
-                            mem += 3;
+                            codeMem += 3;
                             break;
                         case 2:
                         case 4:
-                            mem += 5;
+                            codeMem += 5;
                             break;
                         case 3:
                         case 5:
-                            mem += 9;
+                            codeMem += 9;
                             break;
                         case 6 ... 11:
-                            mem += 4;
+                            codeMem += 4;
                             break;
                         case 12:
-                            mem += 5;
+                            codeMem += 5;
                             break;
                         //POP CASES
                         case 25 ... 30:
-                            mem += 4;
+                            codeMem += 4;
                             break;
                         case 31:
-                            mem += 5;
+                            codeMem += 5;
                             break;
                         //SHFT CASES
                         case 123 ... 130:
-                            mem += 2;
+                            codeMem += 2;
                             break;
                         //JMP CASES
                         case 131:
-                            mem += 4;
+                            codeMem += 4;
                             break;
                         case 132:
-                            mem += 2;
+                            codeMem += 2;
                             break;
                         case 134 ... 139:
-                            mem += 4;
+                            codeMem += 4;
                             break;
                         //CALL CASE
                         case 140:
-                            mem += 4;
+                            codeMem += 4;
                             break;
                         default:
                             EXIT_ERROR(i + 1);
@@ -426,7 +428,7 @@ void firstPass(FILE* fp){
                     }
                 }
                 else if (emptyParams == 1){
-                    mem++;
+                    codeMem++;
                 }
                 else{
                     EXIT_ERROR(i + 1);
@@ -441,14 +443,14 @@ void firstPass(FILE* fp){
                 if(dataVal < -128 || dataVal > 127){
                     EXIT_ERROR(i + 1);
                 }
-                mem++;
+                dataMem++;
             }
             else if(codeOrData == 1 && directives == 1){
                 //TODO: Verify ascii check
                 if(strlen(buffer) != 2){
                     EXIT_ERROR(i + 1);
                 }
-                mem++;
+                dataMem++;
             }
             else if(codeOrData == 1 && directives == 2){
                 checkDigits(buff, i);
@@ -456,7 +458,7 @@ void firstPass(FILE* fp){
                 if(dataVal < -32768 || dataVal > 32767){
                     EXIT_ERROR(i + 1);
                 }
-                mem += 2;
+                dataMem += 2;
             }
             else if(codeOrData == 1 && directives == 3){
                 checkDigits(buff, i);
@@ -464,7 +466,7 @@ void firstPass(FILE* fp){
                 if(dataVal < -2147483648 || dataVal > 2147483647){
                     EXIT_ERROR(i + 1);
                 }
-                mem += 4;
+                dataMem += 4;
             }
             //TODO: verify bounds checking for 64 bit signed integers
             else if(codeOrData == 1 && directives == 4){
@@ -475,7 +477,7 @@ void firstPass(FILE* fp){
                 if(dataVal == max && strcmp(buff, "9223372036854775807") != 0){
                     EXIT_ERROR(i + 1);
                 }
-                mem += 8;
+                dataMem += 8;
             }
             //TODO: verify bounds for floating point numbers
             else if(codeOrData == 1 && directives == 5){
@@ -484,7 +486,7 @@ void firstPass(FILE* fp){
                 if(fptr[0] != '\0'){
                     EXIT_ERROR(i + 1);
                 }
-                mem += 4;
+                dataMem += 4;
             }
             else if(codeOrData == 1 && directives == 6){
                 char* dptr;
@@ -492,7 +494,7 @@ void firstPass(FILE* fp){
                 if(dptr[0] != '\0'){
                     EXIT_ERROR(i + 1);
                 }
-                mem += 8;
+                dataMem += 8;
             }
             else{
                 EXIT_ERROR(i + 1);
@@ -508,7 +510,12 @@ void firstPass(FILE* fp){
                 EXIT_ERROR(i + 1);
             }
             regfree(&regex);
-            insert(name, mem, strlen(name));
+            if(codeOrData == 0){
+                insert(name, codeMem, strlen(name));
+            }
+            else{
+                insert(name, dataMem, strlen(name));
+            }
         }
         else if(c != ';'){
             EXIT_ERROR(i + 1);
@@ -521,14 +528,175 @@ void firstPass(FILE* fp){
     }
 }
 
-void read(FILE* fp, char* outFile){
-    FILE* out = fopen(outFile, "wb");
+void readCode(FILE* fp, FILE* out){
+    rewind(fp);
+    //code, data, byte, ascii, short, int, long, float, double
+    int codeOrData = 1;
+    for(int i = 0; i < lines; i++){
+        char* buffer = (char*) calloc (512 * sizeof(char), 1);
+        fgets(buffer, 512, fp);
+        buffer[strcspn(buffer, "\n")] = '\0';
+        char c = buffer[0];
+        if(c == '.'){
+            char* buff = strtok(buffer, ".");
+            if(strcmp(buff, "code") == 0){
+                codeOrData = 0;
+            }
+            else if(strcmp(buff, "data") == 0){
+                codeOrData = 1;
+            }
+        }
+        else if(c == '\t'){
+            char* buff = strtok(buffer, "\t");
+            if(codeOrData == 0){
+                char* cmdName = (char*) calloc(256 * sizeof(char), 1);
+                int j = 0;
+                for(j = 0; buff[j] != ' ' && buff[j] != '\n' && buff[j] != '\0' && buff[j] != EOF; j++){
+                    cmdName[j] = buff[j];
+                }
+                uint8_t cmdNum = searchCMD(cmdName, i);
+                int emptyParams = 1;
+                char* cmdParams = (char*) calloc(strlen(buff) * sizeof(char) - strlen(cmdName) * sizeof(char), 1);
+                for(int h = j + 1; h < strlen(buff) && buff[h] != '\n' && buff[h] != '\0'; h++){
+                    emptyParams = 0;
+                    cmdParams[h - j - 1] = buff[h];
+                }
+                fwrite(&cmdNum, sizeof(cmdNum), 1, out);
+                if(emptyParams == 0){
+                    splitter(cmdParams, cmdNum, out);
+                }
+                free(cmdName);
+                free(cmdParams);
+            }
+        }
+        free(buffer);
+    }
+}
+
+void splitter(char* cmdParams, uint8_t cmdNum, FILE* out){
+    //TODO: Figure out splitter
+    //TODO: Handle commands with params
+    switch(cmdNum){
+        case 0:
+        case 123 ... 130:
+        case 132: ;
+            int8_t byteNum = atoi(cmdParams);
+            fwrite(&byteNum, sizeof(byteNum), 1, out);
+            break;
+        case 1: ;
+            int16_t shortNum = atoi(cmdParams);
+            for(int i = 1; i >= 0; i--){
+                int8_t byteNum = shortNum >> (i * 8) & 0xff;
+                fwrite(&byteNum, sizeof(byteNum), 1, out);
+            }
+            break;
+        case 2: ;
+            int32_t intNum = atoi(cmdParams);
+            for(int i = 3; i >= 0; i--){
+                int8_t byteNum = intNum >> (i * 8) & 0xff;
+                fwrite(&byteNum, sizeof(byteNum), 1, out);
+            }
+            break;
+        case 3: ;
+            int64_t longNum = atoi(cmdParams);
+            for(int i = 7; i >= 0; i--){
+                int8_t byteNum = longNum >> (i * 8) & 0xff;
+                fwrite(&byteNum, sizeof(byteNum), 1, out);
+            }
+            break;
+        case 4: ;
+            float floatNum = atof(cmdParams);
+            uint32_t asInt = *((uint32_t*)&floatNum);
+            for(int i = 3; i >= 0; i--){
+                int8_t byteNum = asInt >> (i * 8) & 0xff;
+                fwrite(&byteNum, sizeof(byteNum), 1, out);
+            }
+            break;
+        case 5: ;
+            double doubleNum = atof(cmdParams);
+            uint64_t asLongInt = *((uint64_t*)&doubleNum);
+            for(int i = 3; i >= 0; i--){
+                int8_t byteNum = asLongInt >> (i * 8) & 0xff;
+                fwrite(&byteNum, sizeof(byteNum), 1, out);
+            }
+            break;
+        case 6 ... 11:
+        case 25 ... 30:
+        case 134 ... 140: ;
+            uint32_t address = 0;
+            if(strchr(cmdParams, '+') != NULL){
+                char* add = strchr(cmdParams, '+');
+                char* addr = strtok(cmdParams, "+");
+                long addNum = atol(add);
+                int addrNum = search(addr, -1);
+                address = addrNum + addNum;
+            }
+            else if(strchr(cmdParams, '-') != NULL){
+                char* add = strchr(cmdParams, '-');
+                char* addr = strtok(cmdParams, "-");
+                long addNum = atol(add);
+                int addrNum = search(addr, -1);
+                address = addrNum + addNum;
+            }
+            else{
+                char* ptr;
+                address = strtoul(cmdParams, &ptr, 10);
+            }
+            for(int i = 2; i >= 0; i--){
+                int8_t byteNum = address >> (i * 8) & 0xff;
+                fwrite(&byteNum, sizeof(byteNum), 1, out);
+            }
+            break;
+        case 12:
+        case 31: ;
+            char* param1 = (char*) calloc (sizeof(char) * strlen(cmdParams), 1);
+            int i;
+            for(i = 0; i < strlen(cmdParams) && cmdParams[i] != ','; i++){
+                param1[i] = cmdParams[i];
+            }
+            char* param2 = (char*) calloc (sizeof(char) * strlen(cmdParams), 1);
+            i+=2;
+            int j = 0;
+            for(; i < strlen(cmdParams); i++){
+                param2[j++] = cmdParams[i];
+            }
+            uint32_t addressNum = 0;
+            if(strchr(param1, '+') != NULL){
+                char* add = strchr(param1, '+');
+                char* addr = strtok(param1, "+");
+                long addNum = atol(add);
+                int addrNum = search(addr, -1);
+                addressNum = addrNum + addNum;
+            }
+            else if(strchr(param1, '-') != NULL){
+                char* add = strchr(param1, '-');
+                char* addr = strtok(param1, "-");
+                long addNum = atol(add);
+                int addrNum = search(addr, -1);
+                addressNum = addrNum + addNum;
+            }
+            else{
+                char* ptr;
+                addressNum = strtoul(param1, &ptr, 10);
+            }
+            for(int i = 2; i >= 0; i--){
+                int8_t byteNum = addressNum >> (i * 8) & 0xff;
+                fwrite(&byteNum, sizeof(byteNum), 1, out);
+            }
+            int8_t param2Num = atoi(param2);
+            fwrite(&param2Num, sizeof(param2Num), 1, out);
+            break;
+        default:
+            EXIT_ERROR(-1);
+            break;
+    }
+}
+
+void readData(FILE* fp, FILE* out){
     rewind(fp);
     //code, data, byte, ascii, short, int, long, float, double
     int codeOrData = 1;
     int directives = 0;
-    int emptyParams = 0;
-    int mem = 0;
     for(int i = 0; i < lines; i++){
         char* buffer = (char*) calloc (512 * sizeof(char), 1);
         fgets(buffer, 512, fp);
@@ -566,47 +734,27 @@ void read(FILE* fp, char* outFile){
         }
         else if(c == '\t'){
             char* buff = strtok(buffer, "\t");
-            if(codeOrData == 0){
-                char* cmdName = (char*) calloc(256 * sizeof(char), 1);
-                int j = 0;
-                for(j = 0; buff[j] != ' ' && buff[j] != '\n' && buff[j] != '\0' && buff[j] != EOF; j++){
-                    cmdName[j] = buff[j];
-                }
-                uint8_t cmdNum = searchCMD(cmdName, i);
-                int emptyParams = 1;
-                char* cmdParams = (char*) calloc(strlen(buff) * sizeof(char) - strlen(cmdName) * sizeof(char), 1);
-                for(int h = j + 1; h < strlen(buff) && buff[h] != '\n' && buff[h] != '\0'; h++){
-                    emptyParams = 0;
-                    cmdParams[h - j - 1] = buff[h];
-                }
-                fwrite(&cmdNum, sizeof(cmdNum), 1, out);
-                if(emptyParams == 0){
-                    splitter(cmdParams, cmdNum, out);
-                }
-                free(cmdName);
-                free(cmdParams);
-            }
-            else if((codeOrData == 1 && directives == 0) || (codeOrData == 1 && directives == 1)){
+            if((codeOrData == 1 && directives == 0) || (codeOrData == 1 && directives == 1)){
                 int8_t byteNum = atoi(buff);
                 fwrite(&byteNum, sizeof(byteNum), 1, out);
             }
             else if(codeOrData == 1 && directives == 2){
                 int16_t shortNum = atoi(buff);
-                for(int i = 0; i < 2; i++){
+                for(int i = 1; i >= 0; i--){
                     int8_t byteNum = shortNum >> (i * 8) & 0xff;
                     fwrite(&byteNum, sizeof(byteNum), 1, out);
                 }
             }
             else if(codeOrData == 1 && directives == 3){
                 int32_t intNum = atoi(buff);
-                for(int i = 0; i < 4; i++){
+                for(int i = 3; i >= 0; i--){
                     int8_t byteNum = intNum >> (i * 8) & 0xff;
                     fwrite(&byteNum, sizeof(byteNum), 1, out);
                 }
             }
             else if(codeOrData == 1 && directives == 4){
                 int64_t longNum = atoi(buff);
-                for(int i = 0; i < 8; i++){
+                for(int i = 7; i >= 0; i--){
                     int8_t byteNum = longNum >> (i * 8) & 0xff;
                     fwrite(&byteNum, sizeof(byteNum), 1, out);
                 }
@@ -614,7 +762,7 @@ void read(FILE* fp, char* outFile){
             else if(codeOrData == 1 && directives == 5){
                 float floatNum = atof(buff);
                 uint32_t asInt = *((uint32_t*)&floatNum);
-                for(int i = 0; i < 4; i++){
+                for(int i = 3; i >= 0; i--){
                     int8_t byteNum = asInt >> (i * 8) & 0xff;
                     fwrite(&byteNum, sizeof(byteNum), 1, out);
                 }
@@ -622,129 +770,11 @@ void read(FILE* fp, char* outFile){
             else if(codeOrData == 1 && directives == 6){
                 double doubleNum = atof(buff);
                 uint64_t asLongInt = *((uint64_t*)&doubleNum);
-                for(int i = 0; i < 4; i++){
+                for(int i = 7; i >= 0; i--){
                     int8_t byteNum = asLongInt >> (i * 8) & 0xff;
                     fwrite(&byteNum, sizeof(byteNum), 1, out);
                 }
             }
         }
-        free(buffer);
-    }
-}
-
-void splitter(char* cmdParams, uint8_t cmdNum, FILE* out){
-    //TODO: Figure out splitter
-    //TODO: Handle commands with params
-    switch(cmdNum){
-        case 0:
-        case 123 ... 130:
-        case 132: ;
-            int8_t byteNum = atoi(cmdParams);
-            fwrite(&byteNum, sizeof(byteNum), 1, out);
-            break;
-        case 1: ;
-            int16_t shortNum = atoi(cmdParams);
-            for(int i = 0; i < 2; i++){
-                int8_t byteNum = shortNum >> (i * 8) & 0xff;
-                fwrite(&byteNum, sizeof(byteNum), 1, out);
-            }
-            break;
-        case 2: ;
-            int32_t intNum = atoi(cmdParams);
-            for(int i = 0; i < 4; i++){
-                int8_t byteNum = intNum >> (i * 8) & 0xff;
-                fwrite(&byteNum, sizeof(byteNum), 1, out);
-            }
-            break;
-        case 3: ;
-            int64_t longNum = atoi(cmdParams);
-            for(int i = 0; i < 8; i++){
-                int8_t byteNum = longNum >> (i * 8) & 0xff;
-                fwrite(&byteNum, sizeof(byteNum), 1, out);
-            }
-            break;
-        case 4: ;
-            float floatNum = atof(cmdParams);
-            uint32_t asInt = *((uint32_t*)&floatNum);
-            for(int i = 0; i < 4; i++){
-                int8_t byteNum = asInt >> (i * 8) & 0xff;
-                fwrite(&byteNum, sizeof(byteNum), 1, out);
-            }
-            break;
-        case 5: ;
-            double doubleNum = atof(cmdParams);
-            uint64_t asLongInt = *((uint64_t*)&doubleNum);
-            for(int i = 0; i < 4; i++){
-                int8_t byteNum = asLongInt >> (i * 8) & 0xff;
-                fwrite(&byteNum, sizeof(byteNum), 1, out);
-            }
-            break;
-        case 6 ... 11:
-        case 134 ... 140: ;
-            uint32_t address = 0;
-            if(strchr(cmdParams, '+') != NULL){
-                char* add = strchr(cmdParams, '+');
-                char* addr = strtok(cmdParams, "+");
-                long addNum = atol(add);
-                int addrNum = search(addr, -1);
-                address = addrNum + addNum;
-            }
-            else if(strchr(cmdParams, '-') != NULL){
-                char* add = strchr(cmdParams, '-');
-                char* addr = strtok(cmdParams, "-");
-                long addNum = atol(add);
-                int addrNum = search(addr, -1);
-                address = addrNum + addNum;
-            }
-            else{
-                char* ptr;
-                address = strtoul(cmdParams, &ptr, 10);
-            }
-            for(int i = 0; i < 3; i++){
-                int8_t byteNum = address >> (i * 8) & 0xff;
-                fwrite(&byteNum, sizeof(byteNum), 1, out);
-            }
-            break;
-        case 12: ;
-            char* param1 = (char*) calloc (sizeof(char) * strlen(cmdParams), 1);
-            int i;
-            for(i = 0; i < strlen(cmdParams) && cmdParams[i] != ','; i++){
-                param1[i] = cmdParams[i];
-            }
-            char* param2 = (char*) calloc (sizeof(char) * strlen(cmdParams), 1);
-            i+=2;
-            int j = 0;
-            for(; i < strlen(cmdParams); i++){
-                param2[j++] = cmdParams[i];
-            }
-            uint32_t addressNum = 0;
-            if(strchr(param1, '+') != NULL){
-                char* add = strchr(param1, '+');
-                char* addr = strtok(param1, "+");
-                long addNum = atol(add);
-                int addrNum = search(addr, -1);
-                addressNum = addrNum + addNum;
-            }
-            else if(strchr(param1, '-') != NULL){
-                char* add = strchr(param1, '-');
-                char* addr = strtok(param1, "-");
-                long addNum = atol(add);
-                int addrNum = search(addr, -1);
-                addressNum = addrNum + addNum;
-            }
-            else{
-                char* ptr;
-                addressNum = strtoul(param1, &ptr, 10);
-            }
-            for(int i = 0; i < 3; i++){
-                int8_t byteNum = addressNum >> (i * 8) & 0xff;
-                fwrite(&byteNum, sizeof(byteNum), 1, out);
-            }
-            int8_t param2Num = atoi(param2);
-            fwrite(&param2Num, sizeof(param2Num), 1, out);
-            break;
-        default:
-            EXIT_ERROR(-1);
-            break;
     }
 }

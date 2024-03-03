@@ -55,7 +55,9 @@ void firstPass(FILE* fp);
 
 void checkValid(int cmdNum, char* cmdParams, int emptyParams, int line);
 
-void read(FILE* fp, char* outFile);
+void readCode(FILE* fp, FILE* out);
+
+void readData(FILE* fp, FILE* out);
 
 void splitter(char* cmdParams, uint8_t cmdNum, FILE* out);
 
