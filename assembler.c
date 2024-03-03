@@ -766,7 +766,7 @@ void readData(FILE* fp, FILE* out){
                 }
             }
             else if(codeOrData == 1 && directives == 4){
-                int64_t longNum = atoi(buff);
+                int64_t longNum = atoll(buff);
                 for(int i = 7; i >= 0; i--){
                     int8_t byteNum = longNum >> (i * 8) & 0xff;
                     fwrite(&byteNum, sizeof(byteNum), 1, out);
