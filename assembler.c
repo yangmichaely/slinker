@@ -324,6 +324,9 @@ void firstPass(FILE* fp){
         }
         else if(c == '\t'){
             char* buff = strtok(buffer, "\t");
+            if(buff == NULL){
+                EXIT_ERROR(i);
+            }
             if(codeOrData == 0){
                 char* cmdName = (char*) calloc(256 * sizeof(char), 1);
                 int j = 0;

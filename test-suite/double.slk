@@ -1,5 +1,5 @@
 .data
 .byte
-	l1
+	
 .code
 	halt
