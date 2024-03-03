@@ -135,7 +135,6 @@ int twentyFourCheck(long num){
 void checkValid(int cmdNum, char* cmdParams, int emptyParams, int line){
     switch(cmdNum){
         regex_t regex;
-        char* ptr;
         case 13 ... 24:
         case 32 ... 122:
         case 133:
@@ -196,14 +195,16 @@ void checkValid(int cmdNum, char* cmdParams, int emptyParams, int line){
             }
             break;
         case 4: ;
-            float numFloat = strtof(cmdParams, &ptr);
-            if(ptr != "\0"){
+            char* fpointer;
+            float numFloat = strtof(cmdParams, &fpointer);
+            if(fpointer != NULL){
                 EXIT_ERROR(line);
             }
             break;
         case 5: ;
-            double numDouble = strtod(cmdParams, &ptr);
-            if(ptr != "\0"){
+            char* dpointer;
+            double numDouble = strtod(cmdParams, &dpointer);
+            if(dpointer != NULL){
                 EXIT_ERROR(line);
             }
             break;
