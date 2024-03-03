@@ -436,7 +436,7 @@ void firstPass(FILE* fp){
                 int64_t max = 9223372036854775807;
                 char *ptr;
                 long long dataVal = strtoul(buff, &ptr, 10);
-                if(ptr != "\0"){
+                if(ptr != NULL){
                     EXIT_ERROR(i);
                 }
                 longCheck(dataVal, i, buff);
@@ -446,7 +446,7 @@ void firstPass(FILE* fp){
             else if(codeOrData == 1 && directives == 5){
                 char* fptr;
                 float value = strtof(buff, &fptr);
-                if(fptr[0] != '\0'){
+                if(fptr != NULL){
                     EXIT_ERROR(i);
                 }
                 dataMem += 4;
@@ -454,7 +454,7 @@ void firstPass(FILE* fp){
             else if(codeOrData == 1 && directives == 6){
                 char* dptr;
                 double value = strtod(buff, &dptr);
-                if(dptr != "\0"){
+                if(dptr != NULL){
                     EXIT_ERROR(i);
                 }
                 dataMem += 8;
