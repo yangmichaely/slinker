@@ -16,7 +16,7 @@ const char* VALID_COMMANDS[143] = {"pushb", "pushs", "pushi", "pushl", "pushf", 
 "addd", "subb", "subs", "subi", "subl", "subf", "subd", "mulb", "muls", "muli", "mull", "mulf", "muld", "divb", "divs", "divi", "divl", 
 "divf", "divd", "and8", "and16", "and32", "and64", "or8", "or16", "or32", "or64", "xor8", "xor16", "xor32", "xor64", "not8", "not16",
 "not32", "not64", "shftrb", "shftrs", "shftri", "shftrl", "shftlb", "shftls", "shftli", "shftll", "jmp", "jrpc", "jind", "jz", "jnz", "jgt",
-"jlt", "jge", "jle", "call", "return", "halt"};
+"jlt", "jge", "jle", "call", "ret", "halt"};
 
 const char* VALID_PARAMETERS[36] = {"^[a-zA-Z0-9_]+$", "^[-+]?[0-9]+$", "^[-+]?[0-9]+|:[a-zA-Z0-9_]+\\+[0-9]+|:[a-zA-Z0-9_]+|:[a-zA-Z0-9_]+\\-[0-9]+$",
 "^[-+]?[0-9]+|:[a-zA-Z0-9_]+\\+[0-9]+|:[a-zA-Z0-9_]+|:[a-zA-Z0-9_]+\\-[0-9]+, [-+]?[0-9]+$"};
