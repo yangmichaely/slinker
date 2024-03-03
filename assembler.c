@@ -250,11 +250,11 @@ void checkValid(int cmdNum, char* cmdParams, int emptyParams, int line){
 }
 
 int checkDigits(char* num, int line){
-    if(num[0] != '-' && !isdigit(num[0])){
-        EXIT_ERROR(line + 1);
+    if(num[0] != '-' && isdigit(num[0]) == 0){
+        EXIT_ERROR(line);
     }
     for (int j = 1; j < strlen(num); j++){
-        if (!isdigit(num[j])){
+        if (isdigit(num[j]) == 0){
             EXIT_ERROR(line);
         }
     }
@@ -406,9 +406,7 @@ void firstPass(FILE* fp){
             else if(codeOrData == 1 && directives == 0){
                 checkDigits(buff, i);
                 int dataVal = atoi(buff);
-                if(dataVal < -128 || dataVal > 127){
-                    EXIT_ERROR(i);
-                }
+                byteCheck(dataVal, i);
                 dataMem++;
             }
             else if(codeOrData == 1 && directives == 1){
