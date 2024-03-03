@@ -280,7 +280,7 @@ void firstPass(FILE* fp){
     int directives = 0;
     int emptyParams = 0;
     int codeMem = 0;
-    int dataMem = 0;
+    int dataMem = 0x10000;
     for(int i = 0; i < lines; i++){
         char* buffer = (char*) calloc (512 * sizeof(char), 1);
         fgets(buffer, 512, fp);
