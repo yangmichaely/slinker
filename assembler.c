@@ -106,13 +106,13 @@ void byteCheck(int num, int line){
 }
 
 void shortCheck(int num, int line){
-    if(num < -128 || num > 127){
+    if(num < SHRT_MIN || num > SHRT_MAX){
         EXIT_ERROR(line);
     }
 }
 
-void intCheck(int num, int line){
-    if(num < -128 || num > 127){
+void intCheck(long num, int line){
+    if(num < INT_MIN || num > INT_MAX){
         EXIT_ERROR(line);
     }
 }
@@ -175,7 +175,7 @@ void checkValid(int cmdNum, char* cmdParams, int emptyParams, int line){
             regcomp(&regex, VALID_PARAMETERS[1], REG_EXTENDED);
             if(regexec(&regex, cmdParams, 0, NULL, 0) == 0){
                 regfree(&regex);
-                int num = atol(cmdParams);
+                long num = atol(cmdParams);
                 intCheck(num, line);
             }
             else{
@@ -426,14 +426,13 @@ void firstPass(FILE* fp){
             }
             else if(codeOrData == 1 && directives == 3){
                 checkDigits(buff, i);
-                int dataVal = atoi(buff);
+                long dataVal = atol(buff);
                 intCheck(dataVal, i);
                 dataMem += 4;
             }
             //TODO: verify bounds checking for 64 bit signed integers
             else if(codeOrData == 1 && directives == 4){
                 checkDigits(buff, i);
-                int64_t max = 9223372036854775807;
                 char *ptr;
                 long long dataVal = strtoul(buff, &ptr, 10);
                 if(ptr[0] != '\0'){
