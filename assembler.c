@@ -421,17 +421,13 @@ void firstPass(FILE* fp){
             else if(codeOrData == 1 && directives == 2){
                 checkDigits(buff, i);
                 int dataVal = atoi(buff);
-                if(dataVal < -32768 || dataVal > 32767){
-                    EXIT_ERROR(i);
-                }
+                shortCheck(dataVal, i);
                 dataMem += 2;
             }
             else if(codeOrData == 1 && directives == 3){
                 checkDigits(buff, i);
                 int dataVal = atoi(buff);
-                if(dataVal < -2147483648 || dataVal > 2147483647){
-                    EXIT_ERROR(i);
-                }
+                intCheck(dataVal, i);
                 dataMem += 4;
             }
             //TODO: verify bounds checking for 64 bit signed integers
@@ -439,10 +435,11 @@ void firstPass(FILE* fp){
                 checkDigits(buff, i);
                 int64_t max = 9223372036854775807;
                 char *ptr;
-                int64_t dataVal = strtoul(buff, &ptr, 10);
-                if(dataVal == max && strcmp(buff, "9223372036854775807") != 0){
+                long long dataVal = strtoul(buff, &ptr, 10);
+                if(ptr != "\0"){
                     EXIT_ERROR(i);
                 }
+                longCheck(dataVal, i, buff);
                 dataMem += 8;
             }
             //TODO: verify bounds for floating point numbers
@@ -457,7 +454,7 @@ void firstPass(FILE* fp){
             else if(codeOrData == 1 && directives == 6){
                 char* dptr;
                 double value = strtod(buff, &dptr);
-                if(dptr[0] != '\0'){
+                if(dptr != "\0"){
                     EXIT_ERROR(i);
                 }
                 dataMem += 8;
@@ -742,7 +739,6 @@ void readData(FILE* fp, FILE* out){
         }
         else if(c == '\t'){
             char* buff = strtok(buffer, "\t");
-            printf("%s\n", buff);
             if(codeOrData == 1 && directives == 0){
                 int8_t byteNum = atoi(buff);
                 fwrite(&byteNum, sizeof(byteNum), 1, out);
