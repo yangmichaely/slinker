@@ -227,14 +227,14 @@ void checkValid(int cmdNum, char* cmdParams, int emptyParams, int line){
                 regfree(&regex);
                 char* param1 = (char*) calloc (sizeof(char) * strlen(cmdParams), 1);
                 int i;
-                for(i = 0; i < strlen(cmdParams) && cmdParams[i] != ','; i++){
+                for(i = 0; i < strlen(cmdParams) && cmdParams[i] != ' '; i++){
                     param1[i] = cmdParams[i];
                 }
                 char* param2 = (char*) calloc (sizeof(char) * strlen(cmdParams), 1);
-                i+=2;
                 int j = 0;
-                for(; i < strlen(cmdParams); i++){
-                    param2[j++] = cmdParams[i];
+                for(int h = i + 1; h < strlen(cmdParams); h++){
+                    param2[j] = cmdParams[h];
+                    j++;
                 }
                 int num = atol(param2);
                 byteCheck(num, line);
@@ -642,14 +642,14 @@ int splitter(char* cmdParams, uint8_t cmdNum, FILE* out){
         case 31: ;
             char* param1 = (char*) calloc (sizeof(char) * strlen(cmdParams), 1);
             int i;
-            for(i = 0; i < strlen(cmdParams) && cmdParams[i] != ','; i++){
+            for(i = 0; i < strlen(cmdParams) && cmdParams[i] != ' '; i++){
                 param1[i] = cmdParams[i];
             }
             char* param2 = (char*) calloc (sizeof(char) * strlen(cmdParams), 1);
-            i+=2;
             int j = 0;
-            for(; i < strlen(cmdParams); i++){
-                param2[j++] = cmdParams[i];
+            for(int h = i + 1; h < strlen(cmdParams); h++){
+                param2[j] = cmdParams[h];
+                j++;
             }
             uint32_t addressNum = 0;
             if(param1[0] == ':'){
