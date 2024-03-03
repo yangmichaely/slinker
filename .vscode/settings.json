@@ -9,6 +9,10 @@
         "typeindex": "c",
         "typeinfo": "c",
         "ratio": "c",
-        "string.h": "c"
+        "string.h": "c",
+        "cstddef": "c",
+        "bitset": "c",
+        "initializer_list": "c",
+        "utility": "c"
     }
 }

@@ -582,18 +582,29 @@ int splitter(char* cmdParams, uint8_t cmdNum, FILE* out){
             break;
         case 4: ;
             float floatNum = atof(cmdParams);
-            uint32_t asInt = *((uint32_t*)&floatNum);
+            uint32_t asInt = (*(uint32_t*)&floatNum);
             for(int i = 3; i >= 0; i--){
                 int8_t byteNum = asInt >> (i * 8) & 0xff;
                 fwrite(&byteNum, sizeof(byteNum), 1, out);
             }
             break;
         case 5: ;
+            // double doubleNum = atof(cmdParams);
+            // printf("number: %f\n", doubleNum);
+            // uint64_t asLongInt = (*(uint64_t*)&doubleNum);
+            // printf("number: %ld\n", asLongInt);
+            // unsigned char* byteNum = (unsigned char*) &doubleNum;
+            // for(int i = 3; i >= 0; i--){
+            //     int8_t byteNum = asLongInt >> (i * 8) & 0xff;
+            //     fwrite(&byteNum, sizeof(byteNum), 1, out);
+            // }
             double doubleNum = atof(cmdParams);
-            uint64_t asLongInt = *((uint64_t*)&doubleNum);
-            for(int i = 3; i >= 0; i--){
-                int8_t byteNum = asLongInt >> (i * 8) & 0xff;
-                fwrite(&byteNum, sizeof(byteNum), 1, out);
+            printf("number: %f\n", doubleNum);
+            unsigned char* byte = (unsigned char*) &doubleNum;
+            printf("chars: %s\n", byte);
+            size_t size = sizeof(doubleNum);
+            for (byte += size - 1; size--; --byte){
+                fwrite(byte, sizeof(byte), 1, out);
             }
             break;
         case 6 ... 11:
