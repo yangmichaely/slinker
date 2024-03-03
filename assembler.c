@@ -341,8 +341,6 @@ void firstPass(FILE* fp){
                     emptyParams = 0;
                     cmdParams[h - j - 1] = buff[h];
                 }
-                //TODO: fix the checkvalid fucntion
-                //TODO: Figure out bounds check on parameters
                 checkValid(cmdNum, cmdParams, emptyParams, i);
                 if(emptyParams == 0){
                     switch(cmdNum){
@@ -406,7 +404,6 @@ void firstPass(FILE* fp){
                 free(cmdName);
                 free(cmdParams);
             }
-            //TODO: verify bounds checking for each case
             else if(codeOrData == 1 && directives == 0){
                 checkDigits(buff, i);
                 int dataVal = atoi(buff);
@@ -414,7 +411,6 @@ void firstPass(FILE* fp){
                 dataMem++;
             }
             else if(codeOrData == 1 && directives == 1){
-                //TODO: Verify ascii check
                 if(strlen(buffer) != 2){
                     EXIT_ERROR(i);
                 }
@@ -432,7 +428,6 @@ void firstPass(FILE* fp){
                 intCheck(dataVal, i);
                 dataMem += 4;
             }
-            //TODO: verify bounds checking for 64 bit signed integers
             else if(codeOrData == 1 && directives == 4){
                 checkDigits(buff, i);
                 char *ptr;
@@ -443,7 +438,6 @@ void firstPass(FILE* fp){
                 longCheck(dataVal, i, buff);
                 dataMem += 8;
             }
-            //TODO: verify bounds for floating point numbers
             else if(codeOrData == 1 && directives == 5){
                 char* fptr;
                 float value = strtof(buff, &fptr);
@@ -464,7 +458,6 @@ void firstPass(FILE* fp){
                 EXIT_ERROR(i);
             }
         }
-        //TODO: make sure the labels are correctly parsed
         else if(c == ':'){
             char* name = strtok(buffer, ":");
             int found = search(name);
@@ -550,8 +543,6 @@ void readCode(FILE* fp, FILE* out, char* outfile){
 }
 
 int splitter(char* cmdParams, uint8_t cmdNum, FILE* out){
-    //TODO: Figure out splitter
-    //TODO: Handle commands with params
     switch(cmdNum){
         case 0:
         case 123 ... 130:
