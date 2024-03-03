@@ -591,10 +591,10 @@ int splitter(char* cmdParams, uint8_t cmdNum, FILE* out){
         case 5: ;
             double doubleNum = atof(cmdParams);
             printf("number: %f\n", doubleNum);
-            int64_t asLongInt = *(int64_t*)&doubleNum;
-            printf("number: %ld\n", asLongInt);
+            int64_t* asLongInt = (int64_t*)&doubleNum;
+            printf("number: %ld\n", *asLongInt);
             for(int i = 3; i >= 0; i--){
-                int8_t byteNum = asLongInt >> (i * 8) & 0xff;
+                int8_t byteNum = *asLongInt >> (i * 8) & 0xff;
                 fwrite(&byteNum, sizeof(byteNum), 1, out);
             }
             break;
