@@ -742,8 +742,13 @@ void readData(FILE* fp, FILE* out){
         }
         else if(c == '\t'){
             char* buff = strtok(buffer, "\t");
-            if((codeOrData == 1 && directives == 0) || (codeOrData == 1 && directives == 1)){
+            printf("%s\n", buff);
+            if(codeOrData == 1 && directives == 0){
                 int8_t byteNum = atoi(buff);
+                fwrite(&byteNum, sizeof(byteNum), 1, out);
+            }
+            else if(codeOrData == 1 && directives == 1){
+                int8_t byteNum = (int8_t) buff[0];
                 fwrite(&byteNum, sizeof(byteNum), 1, out);
             }
             else if(codeOrData == 1 && directives == 2){

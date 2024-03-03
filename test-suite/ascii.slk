@@ -1,0 +1,5 @@
+.data
+.ascii
+	a
+.code
+	halt
