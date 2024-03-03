@@ -434,7 +434,7 @@ void firstPass(FILE* fp){
             else if(codeOrData == 1 && directives == 4){
                 checkDigits(buff, i);
                 char *ptr;
-                long long dataVal = strtoul(buff, &ptr, 10);
+                long long dataVal = strtoll(buff, &ptr, 10);
                 if(ptr[0] != '\0'){
                     EXIT_ERROR(i);
                 }
