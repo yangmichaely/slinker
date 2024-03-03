@@ -9,6 +9,7 @@
 #include <float.h>
 
 int lines;
+int dataStart;
 
 int main(int argc, char** argv){
     FILE* fp = fopen(argv[1], "r\0");
@@ -530,6 +531,10 @@ void firstPass(FILE* fp){
 
 void readCode(FILE* fp, FILE* out){
     rewind(fp);
+    rewind(out);
+    int codeStart = 8;
+    fwrite(&codeStart, sizeof(codeStart), 1, out);
+    fseek(out, 8, SEEK_SET);
     //code, data, byte, ascii, short, int, long, float, double
     int codeOrData = 1;
     for(int i = 0; i < lines; i++){
@@ -571,6 +576,9 @@ void readCode(FILE* fp, FILE* out){
         }
         free(buffer);
     }
+    dataStart = ftell(out);
+    fseek(out, 4, SEEK_SET);
+    fwrite(&dataStart, sizeof(dataStart), 1, out);
 }
 
 void splitter(char* cmdParams, uint8_t cmdNum, FILE* out){
@@ -693,6 +701,7 @@ void splitter(char* cmdParams, uint8_t cmdNum, FILE* out){
 }
 
 void readData(FILE* fp, FILE* out){
+    fseek(out, dataStart, SEEK_SET);
     rewind(fp);
     //code, data, byte, ascii, short, int, long, float, double
     int codeOrData = 1;
