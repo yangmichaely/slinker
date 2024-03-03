@@ -117,8 +117,11 @@ void intCheck(int num, int line){
     }
 }
 
-void longCheck(long long num, int line){
-    if(num < LONG_MIN || num > LONG_MAX){
+void longCheck(long long num, int line, char* cmdParams){
+    if(strcmp(cmdParams, "9223372036854775807") != 0 && num == LLONG_MAX){
+        EXIT_ERROR(line);
+    }
+    else if(strcmp(cmdParams, "-9223372036854775808") != 0 && num == LLONG_MIN){
         EXIT_ERROR(line);
     }
 }
@@ -185,7 +188,7 @@ void checkValid(int cmdNum, char* cmdParams, int emptyParams, int line){
             if(regexec(&regex, cmdParams, 0, NULL, 0) == 0){
                 regfree(&regex);
                 long long num = atoll(cmdParams);
-                longCheck(num, line);
+                longCheck(num, line, cmdParams);
             }
             else{
                 regfree(&regex);
@@ -573,7 +576,7 @@ int splitter(char* cmdParams, uint8_t cmdNum, FILE* out){
             }
             break;
         case 3: ;
-            int64_t longNum = atoi(cmdParams);
+            int64_t longNum = atol(cmdParams);
             for(int i = 7; i >= 0; i--){
                 int8_t byteNum = longNum >> (i * 8) & 0xff;
                 fwrite(&byteNum, sizeof(byteNum), 1, out);
@@ -597,6 +600,7 @@ int splitter(char* cmdParams, uint8_t cmdNum, FILE* out){
             break;
         case 6 ... 11:
         case 25 ... 30:
+        case 131:
         case 134 ... 140: ;
             uint32_t address = 0;
             if(cmdParams[0] == ':'){
