@@ -43,7 +43,7 @@ void byteCheck(int num, int line);
 
 void shortCheck(int num, int line);
 
-void intCheck(int num, int line);
+void intCheck(long num, int line);
 
 void longCheck(long long num, int line, char* cmdParams);
 
