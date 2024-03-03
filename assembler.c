@@ -582,7 +582,7 @@ int splitter(char* cmdParams, uint8_t cmdNum, FILE* out){
             break;
         case 4: ;
             float floatNum = atof(cmdParams);
-            int32_t asInt = *(int32_t*)&floatNum;
+            uint32_t asInt = *((uint32_t*)&floatNum);
             for(int i = 3; i >= 0; i--){
                 int8_t byteNum = asInt >> (i * 8) & 0xff;
                 fwrite(&byteNum, sizeof(byteNum), 1, out);
@@ -590,11 +590,9 @@ int splitter(char* cmdParams, uint8_t cmdNum, FILE* out){
             break;
         case 5: ;
             double doubleNum = atof(cmdParams);
-            printf("number: %f\n", doubleNum);
-            int64_t* asLongInt = (int64_t*)&doubleNum;
-            printf("number: %ld\n", *asLongInt);
-            for(int i = 3; i >= 0; i--){
-                int8_t byteNum = *asLongInt >> (i * 8) & 0xff;
+            uint64_t asLongInt = *((uint64_t*)&doubleNum);
+            for(int i = 7; i >= 0; i--){
+                int8_t byteNum = asLongInt >> (i * 8) & 0xff;
                 fwrite(&byteNum, sizeof(byteNum), 1, out);
             }
             break;
