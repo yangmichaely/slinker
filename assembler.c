@@ -133,6 +133,10 @@ int twentyFourCheck(long num){
 }
 
 void checkValid(int cmdNum, char* cmdParams, int emptyParams, int line){
+    if(cmdParams[strlen(cmdParams) - 1] == '+' || cmdParams[strlen(cmdParams) - 1] == '-' || 
+    strstr(cmdParams, "-+") != NULL || strstr(cmdParams, "+-") != NULL){
+        EXIT_ERROR(line);
+    }
     switch(cmdNum){
         regex_t regex;
         case 13 ... 24:
