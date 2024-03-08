@@ -142,6 +142,75 @@ double readMemDouble(int numRead, int ind, int codeHeapStack){
     return d;
 }
 
+int8_t byteCheck(char* in){
+    char* ptr;
+    long num = strtol(in, &ptr, 10);
+    if(ptr[0] != '\0'){
+        EXIT_ERROR();
+    }
+    if(num < -128 || num > 127){
+        EXIT_ERROR();
+    }
+    return num;
+}
+
+short shortCheck(char* in){
+    char* ptr;
+    long num = strtol(in, &ptr, 10);
+    if(ptr[0] != '\0'){
+        EXIT_ERROR();
+    }
+    if(num < SHRT_MIN || num > SHRT_MAX){
+        EXIT_ERROR();
+    }
+    return num;
+}
+
+int intCheck(char* in){
+    char* ptr;
+    long num = strtol(in, &ptr, 10);
+    if(ptr[0] != '\0'){
+        EXIT_ERROR();
+    }
+    if(num < INT_MIN || num > INT_MAX){
+        EXIT_ERROR();
+    }
+    return num;
+}
+
+long long longCheck(char* in){
+    char* ptr;
+    long long num = strtoll(in, &ptr, 10);
+    if(ptr[0] != '\0'){
+        EXIT_ERROR();
+    }
+    if(strcmp(in, "9223372036854775807") != 0 && num == LLONG_MAX){
+        EXIT_ERROR();
+    }
+    else if(strcmp(in, "-9223372036854775808") != 0 && num == LLONG_MIN){
+        EXIT_ERROR();
+    }
+    return num;
+}
+
+float floatCheck(char* in){
+    char* ptr;
+    float num = strtof(in, &ptr);
+    if(ptr[0] != '\0'){
+        EXIT_ERROR();
+    }
+    return num;
+}
+
+double doubleCheck(char* in){
+    char* ptr;
+    double num = strtod(in, &ptr);
+    if(ptr[0] != '\0'){
+        EXIT_ERROR();
+    }
+    return num;
+}
+
 void interpret(uint8_t opcode, uint64_t intIn, double floatIn, int8_t secondParam){
     int8_t val8;
     int16_t val16;
@@ -150,6 +219,7 @@ void interpret(uint8_t opcode, uint64_t intIn, double floatIn, int8_t secondPara
     double valDouble;
     float valFloat;
     char valChar;
+    char* in = (char*) calloc (sizeof(char) * 50, 1);
     switch(opcode){
         case 0:
             writeStackVal(1, cpu.sp, intIn);
@@ -577,40 +647,55 @@ void interpret(uint8_t opcode, uint64_t intIn, double floatIn, int8_t secondPara
             break;
         //TODO: bounds checking for input
         case 69:
+            scanf("%s", in);
+            if(strlen(in) != 2){
+                EXIT_ERROR();
+            }
+            val8 = atoi(in);
+            writeStackVal(1, cpu.sp, val8);
+            cpu.sp++;
+            cpu.pc++;
+            break;
         case 70:
-            scanf("%hhd\n", &val8);
+            scanf("%s", in);
+            val8 = byteCheck(in);
             writeStackVal(1, cpu.sp, val8);
             cpu.sp++;
             cpu.pc++;
             break;
         case 71:
-            scanf("%hd\n", &val16);
+            scanf("%s", in);
+            val16 = shortCheck(in);
             writeStackVal(2, cpu.sp, val16);
             cpu.sp += 2;
             cpu.pc++;
             break;
         case 72:
-            scanf("%d\n", &val32);
+            scanf("%s", in);
+            val32 = intCheck(in);
             writeStackVal(4, cpu.sp, val32);
             cpu.sp += 4;
             cpu.pc++;
             break;
         case 73:
-            scanf("%ld\n", &val64);
+            scanf("%s", in);
+            val64 = longCheck(in);
             writeStackVal(8, cpu.sp, val64);
             cpu.sp += 8;
             cpu.pc++;
             break;
         case 74:
-            scanf("%f\n", &valFloat);
+            scanf("%s", in);
+            valFloat = floatCheck(in);
             val32 = *((uint32_t*)&valFloat);
             writeStackVal(4, cpu.sp, val32);
             cpu.sp += 4;
             cpu.pc++;
             break;
         case 75:
-            scanf("%lf\n", &valDouble);
-            val64 = *((uint64_t*)&valFloat);
+            scanf("%s", in);
+            valDouble = doubleCheck(in);
+            val64 = *((uint64_t*)&valDouble);
             writeStackVal(8, cpu.sp, val64);
             cpu.sp += 8;
             cpu.pc++;

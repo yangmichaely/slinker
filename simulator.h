@@ -23,6 +23,18 @@ void EXIT_ERROR();
 
 void memCheck(uint64_t index);
 
+int8_t byteCheck(char* in);
+
+short shortCheck(char* in);
+
+int intCheck(char* in);
+
+long long longCheck(char* in);
+
+float floatCheck(char* in);
+
+double doubleCheck(char* in);
+
 void interpret(uint8_t opcode, uint64_t intIn, double floatIn, int8_t secondParam);
 
 int64_t readMem(int numRead, int ind, int codeHeapStack);
