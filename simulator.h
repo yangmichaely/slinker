@@ -8,8 +8,8 @@
 #ifndef SIMULATOR_H
 #define SIMULATOR_H
 #define MEM_SIZE 512 * 1024
-#define HEAP_START 0x40000
-#define STACK_START 0x10000
+#define HEAP_START 0x10000
+#define STACK_START 0x40000
 
 typedef struct CPU {
     uint8_t mem[MEM_SIZE];
@@ -27,7 +27,13 @@ void interpret(uint8_t opcode, uint64_t intIn, double floatIn, int8_t secondPara
 
 int64_t readMem(int numRead, int ind, int codeHeapStack);
 
+double readMemDouble(int numRead, int ind, int codeHeapStack);
+
+float readMemFloat(int numRead, int ind, int codeHeapStack);
+
 void writeStackVal(int numBytes, int ind, int64_t value);
+
+void writeHeapVal(int numBytes, int ind, int64_t value);
 
 void writeStackMem(int numBytes, int ind, int readInd, int readStackHeap, int writeStackHeap);
 

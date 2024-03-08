@@ -4,7 +4,7 @@
 	dupi
 	addi
 	outi
-	popi
+	popb
 	halt
 ; This program should print 96
 ; end of the program
