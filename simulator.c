@@ -731,8 +731,8 @@ void interpret(uint8_t opcode, uint64_t intIn, double floatIn, int8_t secondPara
             cpu.pc++;
             break;
         case 81:
-            val32 = readMem(4, cpu.sp - 4, 2);
-            printf("%f\n", *((float*) &val32));
+            valFloat = readMemFloat(4, cpu.sp - 4, 2);
+            printf("%f\n", valFloat);
             cpu.sp -= 4;
             cpu.pc++;
             break;
