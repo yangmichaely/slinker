@@ -469,7 +469,7 @@ void interpret(uint8_t opcode, int64_t intIn, double floatIn, int8_t secondParam
             val16 = readMem(2, cpu.sp - 2);
             valFloat = (float) val16;
             val32 = *((int32_t*)&valFloat);
-            writeStackVal(4, cpu.sp - 1, val32);
+            writeStackVal(4, cpu.sp - 2, val32);
             cpu.sp += 2;
             cpu.pc++;
             break;
@@ -477,7 +477,7 @@ void interpret(uint8_t opcode, int64_t intIn, double floatIn, int8_t secondParam
             val16 = readMem(2, cpu.sp - 2);
             valDouble = (double) val16;
             val64 = *((int64_t*)&valDouble);
-            writeStackVal(8, cpu.sp - 1, val64);
+            writeStackVal(8, cpu.sp - 2, val64);
             cpu.sp += 6;
             cpu.pc++;
             break;
