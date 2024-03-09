@@ -1,0 +1,4 @@
+.code
+	pushs 32766
+	outs
+	halt

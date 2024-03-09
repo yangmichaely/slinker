@@ -58,8 +58,9 @@ void heapCheck(uint64_t index){
 
 void writeStackVal(int numBytes, int ind, int64_t value){
     stackCheck(ind + numBytes - 1);
-    for(int i = numBytes - 1; i >= 0; i--){
-        cpu.mem[ind + i] = (uint8_t) value >> (((numBytes - 1 - i) * 8) & 0xff);
+    for(int i = ind + numBytes - 1; i >= ind; i--){
+        cpu.mem[i] = value & 0xff;
+        value >>= 8;
     }
 }
 
@@ -224,17 +225,20 @@ void interpret(uint8_t opcode, int64_t intIn, double floatIn, int8_t secondParam
     char* in = (char*) calloc (sizeof(char) * 50, 1);
     switch(opcode){
         case 0:
-            writeStackVal(1, cpu.sp, (int8_t) intIn);
+            val8 = (int8_t) intIn;
+            writeStackVal(1, cpu.sp, val8);
             cpu.sp++;
             cpu.pc += 2;
             break;
         case 1:
-            writeStackVal(2, cpu.sp, (int16_t) intIn);
+            val16 = (int16_t) intIn;
+            writeStackVal(2, cpu.sp, val16);
             cpu.sp += 2;
             cpu.pc += 3;
             break;
         case 2:
-            writeStackVal(4, cpu.sp, (int32_t) intIn);
+            val32 = (int32_t) intIn;
+            writeStackVal(4, cpu.sp, val32);
             cpu.sp += 4;
             cpu.pc += 5;
             break;
@@ -1180,10 +1184,10 @@ void readBinary(FILE* f){
             case 131:
             case 134 ... 140:
                 intIn = readMem(3, cpu.pc + 1, 0);
+                printf("intin: %ld\n", intIn);
                 break;
             case 12:
             case 31:
-                intIn = readMem(3, cpu.pc + 1, 0);
                 secondParam = readMem(1, cpu.pc + 4, 0);
                 break;
             case 142:
