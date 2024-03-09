@@ -37,17 +37,15 @@ double doubleCheck(char* in);
 
 void interpret(uint8_t opcode, int64_t intIn, double floatIn, int8_t secondParam);
 
-int64_t readMem(int numRead, int ind, int codeHeapStack);
+int64_t readMem(int numRead, int ind);
 
-double readMemDouble(int numRead, int ind, int codeHeapStack);
+double readMemDouble(int numRead, int ind);
 
-float readMemFloat(int numRead, int ind, int codeHeapStack);
+float readMemFloat(int numRead, int ind);
 
 void writeStackVal(int numBytes, int ind, int64_t value);
 
 void writeHeapVal(int numBytes, int ind, int64_t value);
-
-void writeStackMem(int numBytes, int ind, int readInd, int readStackHeap, int writeStackHeap);
 
 void readBinary(FILE* f);
 

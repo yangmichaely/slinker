@@ -44,18 +44,6 @@ void memCheck(uint64_t index){
     }
 }
 
-// void memCheck(uint64_t index){
-//     if(index < STACK_START || index >= MEM_SIZE){
-//         EXIT_ERROR();
-//     }
-// }
-
-// void memCheck(uint64_t index){
-//     if(index < HEAP_START || index >= STACK_START){
-//         EXIT_ERROR();
-//     }
-// }
-
 void writeStackVal(int numBytes, int ind, int64_t value){
     memCheck(ind + numBytes - 1);
     for(int i = ind + numBytes - 1; i >= ind; i--){
@@ -71,35 +59,8 @@ void writeHeapVal(int numBytes, int ind, int64_t value){
     }
 }
 
-void writeStackMem(int numBytes, int ind, int readInd, int readStackHeap, int writeStackHeap){
-    int64_t value;
-    if(readStackHeap == 0){
-        value = readMem(numBytes, readInd, 1);
-    }
-    else{
-        value = readMem(numBytes, readInd, 2);
-    }
-    if(writeStackHeap == 0){
-        memCheck(ind + numBytes - 1);
-    }
-    else{
-        memCheck(ind + numBytes - 1);
-    }
-    for(int i = numBytes - 1; i >= 0; i--){
-        cpu.mem[ind + i] = value >> (((numBytes - 1 - i) * 8) & 0xff);
-    }
-}
-
-int64_t readMem(int numRead, int ind, int codeHeapStack){
-    if(codeHeapStack == 0){
-        memCheck(ind + numRead - 1);
-    }
-    else if(codeHeapStack == 1){
-        memCheck(ind + numRead - 1);
-    }
-    else{
-        memCheck(ind + numRead - 1);
-    }
+int64_t readMem(int numRead, int ind){
+    memCheck(ind + numRead - 1);
     int64_t ans = 0;
     for(int i = ind; i < ind + numRead; i++){
         ans = (ans << 8) | cpu.mem[i];
@@ -107,16 +68,8 @@ int64_t readMem(int numRead, int ind, int codeHeapStack){
     return ans;
 }
 
-float readMemFloat(int numRead, int ind, int codeHeapStack){
-    if(codeHeapStack == 0){
-        memCheck(ind + numRead - 1);
-    }
-    else if(codeHeapStack == 1){
-        memCheck(ind + numRead - 1);
-    }
-    else{
-        memCheck(ind + numRead - 1);
-    }
+float readMemFloat(int numRead, int ind){
+    memCheck(ind + numRead - 1);
     int32_t ans = 0;
     for(int i = ind; i < ind + numRead; i++){
         ans = (ans << 8) | cpu.mem[i];
@@ -125,16 +78,8 @@ float readMemFloat(int numRead, int ind, int codeHeapStack){
     return d;
 }
 
-double readMemDouble(int numRead, int ind, int codeHeapStack){
-    if(codeHeapStack == 0){
-        memCheck(ind + numRead - 1);
-    }
-    else if(codeHeapStack == 1){
-        memCheck(ind + numRead - 1);
-    }
-    else{
-        memCheck(ind + numRead - 1);
-    }
+double readMemDouble(int numRead, int ind){
+    memCheck(ind + numRead - 1);
     int64_t ans = 0;
     for(int i = ind; i < ind + numRead; i++){
         ans = (ans << 8) | cpu.mem[i];
@@ -261,38 +206,38 @@ void interpret(uint8_t opcode, int64_t intIn, double floatIn, int8_t secondParam
             cpu.pc += 9;
             break;
         case 6:
-            val8 = readMem(1, intIn, 1);
+            val8 = readMem(1, intIn);
             writeStackVal(1, cpu.sp, val8);
             cpu.sp += 1;
             cpu.pc += 4;
             break;
         case 7:
-            val16 = readMem(2, intIn, 1);
+            val16 = readMem(2, intIn);
             writeStackVal(2, cpu.sp, val16);
             cpu.sp += 2;
             cpu.pc += 4;
             break;
         case 8:
-            val32 = readMem(4, intIn, 1);
+            val32 = readMem(4, intIn);
             writeStackVal(4, cpu.sp, val32);
             cpu.sp += 4;
             cpu.pc += 4;
             break;
         case 9:
-            val64 = readMem(8, intIn, 1);
+            val64 = readMem(8, intIn);
             writeStackVal(8, cpu.sp, val64);
             cpu.sp += 8;
             cpu.pc += 4;
             break;
         case 10:
-            valFloat = readMemFloat(4, intIn, 1);
+            valFloat = readMemFloat(4, intIn);
             val32 = *((int32_t*)&valFloat);
             writeStackVal(4, cpu.sp, val32);
             cpu.sp += 4;
             cpu.pc += 4;
             break;
         case 11:
-            valDouble = readMemDouble(8, intIn, 1);
+            valDouble = readMemDouble(8, intIn);
             val64 = *((int64_t*) &valDouble);
             writeStackVal(8, cpu.sp, val64);
             cpu.sp += 8;
@@ -306,38 +251,38 @@ void interpret(uint8_t opcode, int64_t intIn, double floatIn, int8_t secondParam
             cpu.pc += 5;
             break;
         case 13:
-            val8 = readMem(1, cpu.sp - 1, 2);
+            val8 = readMem(1, cpu.sp - 1);
             writeStackVal(1, cpu.sp, val8);
             cpu.sp++;
             cpu.pc++;
             break;
         case 14:
-            val16 = readMem(2, cpu.sp - 2, 2);
+            val16 = readMem(2, cpu.sp - 2);
             writeStackVal(2, cpu.sp, val16);
             cpu.sp += 2;
             cpu.pc++;
             break;
         case 15:
-            val32 = readMem(4, cpu.sp - 4, 2);
+            val32 = readMem(4, cpu.sp - 4);
             writeStackVal(4, cpu.sp, val32);
             cpu.sp += 4;
             cpu.pc++;
             break;
         case 16:
-            val64 = readMem(8, cpu.sp - 8, 2);
+            val64 = readMem(8, cpu.sp - 8);
             writeStackVal(8, cpu.sp, val64);
             cpu.sp += 8;
             cpu.pc++;
             break;
         case 17:
-            valFloat = readMemFloat(4, cpu.sp - 4, 2);
+            valFloat = readMemFloat(4, cpu.sp - 4);
             val32 = *((int32_t*)&valFloat);
             writeStackVal(4, cpu.sp, val32);
             cpu.sp += 4;
             cpu.pc++;
             break;
         case 18:
-            valDouble = readMemDouble(8, cpu.sp - 48, 2);
+            valDouble = readMemDouble(8, cpu.sp - 48);
             val64 = *((int64_t*)&valFloat);
             writeStackVal(8, cpu.sp, val64);
             cpu.sp += 8;
@@ -366,7 +311,7 @@ void interpret(uint8_t opcode, int64_t intIn, double floatIn, int8_t secondParam
             cpu.pc++;
             break;
         case 25:
-            val8 = readMem(1, cpu.sp - 1, 2);
+            val8 = readMem(1, cpu.sp - 1);
             writeHeapVal(1, intIn, val8);
             //writeStackMem(1, intIn, cpu.sp - 1, 1, 1);
             //writeStackVal(1, cpu.sp - 1, 0);
@@ -376,7 +321,7 @@ void interpret(uint8_t opcode, int64_t intIn, double floatIn, int8_t secondParam
         case 26:
             //writeStackMem(2, intIn, cpu.sp - 2, 1, 1);
             //writeStackVal(2, cpu.sp - 2, 0);
-            val16 = readMem(2, cpu.sp - 2, 2);
+            val16 = readMem(2, cpu.sp - 2);
             writeHeapVal(2, intIn, val16);
             cpu.sp -= 2;
             cpu.pc += 4;
@@ -384,7 +329,7 @@ void interpret(uint8_t opcode, int64_t intIn, double floatIn, int8_t secondParam
         case 27:
             //writeStackMem(4, intIn, cpu.sp - 4, 1, 1);
             //writeStackVal(4, cpu.sp - 4, 0);
-            val32 = readMem(4, cpu.sp - 4, 2);
+            val32 = readMem(4, cpu.sp - 4);
             writeHeapVal(4, intIn, val32);
             cpu.sp -= 4;
             cpu.pc += 4;
@@ -392,13 +337,13 @@ void interpret(uint8_t opcode, int64_t intIn, double floatIn, int8_t secondParam
         case 28:
             //writeStackMem(8, intIn, cpu.sp - 8, 1, 1);
             //writeStackVal(8, cpu.sp - 8, 0);
-            val64 = readMem(8, cpu.sp - 8, 2);
+            val64 = readMem(8, cpu.sp - 8);
             writeHeapVal(8, intIn, val64);
             cpu.sp -= 8;
             cpu.pc += 4;
             break;
         case 29:
-            valFloat = readMemFloat(4, cpu.sp - 4, 2);
+            valFloat = readMemFloat(4, cpu.sp - 4);
             val32 = *((int32_t*)&valFloat);
             writeHeapVal(8, intIn, val32);
             //writeStackVal(8, cpu.sp - 8, 0);
@@ -406,7 +351,7 @@ void interpret(uint8_t opcode, int64_t intIn, double floatIn, int8_t secondParam
             cpu.pc += 4;
             break;
         case 30:
-            valDouble = readMemDouble(8, cpu.sp - 8, 2);
+            valDouble = readMemDouble(8, cpu.sp - 8);
             val64 = *((int64_t*)&valDouble);
             writeHeapVal(8, intIn, val64);
             //writeStackVal(8, cpu.sp - 8, 0);
@@ -423,71 +368,71 @@ void interpret(uint8_t opcode, int64_t intIn, double floatIn, int8_t secondParam
             cpu.pc += 5;
             break;
         case 32:
-            val8 = readMem(1, cpu.sp - 1, 2);
-            int8_t tmp8 = readMem(1, cpu.sp - 2, 2);
+            val8 = readMem(1, cpu.sp - 1);
+            int8_t tmp8 = readMem(1, cpu.sp - 2);
             writeStackVal(1, cpu.sp - 2, val8);
             writeStackVal(1, cpu.sp - 1, tmp8);
             cpu.pc++;
             break;
         case 33:
-            val16 = readMem(2, cpu.sp - 2, 2);
-            int16_t tmp16 = readMem(2, cpu.sp - 4, 2);
+            val16 = readMem(2, cpu.sp - 2);
+            int16_t tmp16 = readMem(2, cpu.sp - 4);
             writeStackVal(2, cpu.sp - 4, val16);
             writeStackVal(2, cpu.sp - 2, tmp16);
             cpu.pc++;
             break;
         case 34:
-            val32 = readMem(4, cpu.sp - 4, 2);
-            tmp32 = readMem(4, cpu.sp - 8, 2);
+            val32 = readMem(4, cpu.sp - 4);
+            tmp32 = readMem(4, cpu.sp - 8);
             writeStackVal(4, cpu.sp - 8, val32);
             writeStackVal(4, cpu.sp - 4, tmp32);
             cpu.pc++;
             break;
         case 35:
-            val64 = readMem(8, cpu.sp - 8, 2);
-            tmp64 = readMem(8, cpu.sp - 16, 2);
+            val64 = readMem(8, cpu.sp - 8);
+            tmp64 = readMem(8, cpu.sp - 16);
             writeStackVal(8, cpu.sp - 16, val64);
             writeStackVal(8, cpu.sp - 8, tmp64);
             cpu.pc++;
             break;
         case 36:
-            valFloat = readMemFloat(4, cpu.sp - 4, 2);
+            valFloat = readMemFloat(4, cpu.sp - 4);
             val32 = *((int32_t*)&valFloat);
-            float tmpFloat = readMemFloat(4, cpu.sp - 8, 2);
+            float tmpFloat = readMemFloat(4, cpu.sp - 8);
             tmp32 = *((int32_t*)&tmpFloat);
             writeStackVal(4, cpu.sp - 8, val32);
             writeStackVal(4, cpu.sp - 4, tmp32);
             cpu.pc++;
             break;
         case 37:
-            valDouble = readMemDouble(8, cpu.sp - 8, 2);
+            valDouble = readMemDouble(8, cpu.sp - 8);
             val64 = *((int64_t*)&valDouble);
-            double tmpDouble = readMemDouble(8, cpu.sp - 16, 2);
+            double tmpDouble = readMemDouble(8, cpu.sp - 16);
             tmp64 = *((int64_t*)&tmpDouble);
             writeStackVal(8, cpu.sp - 16, val64);
             writeStackVal(8, cpu.sp - 8, tmp64);
             cpu.pc++;
             break;
         case 38:
-            val16 = (int16_t) readMem(1, cpu.sp - 1, 2);
+            val16 = (int16_t) readMem(1, cpu.sp - 1);
             writeStackVal(2, cpu.sp - 1, val16);
             cpu.sp++;
             cpu.pc++;
             break;
         case 39:
-            val32 = (int32_t) readMem(1, cpu.sp - 1, 2);
+            val32 = (int32_t) readMem(1, cpu.sp - 1);
             writeStackVal(4, cpu.sp - 1, val32);
             cpu.sp += 3;
             cpu.pc++;
             break;
         case 40:
-            val64 = (int64_t) readMem(1, cpu.sp - 1, 2);
+            val64 = (int64_t) readMem(1, cpu.sp - 1);
             writeStackVal(8, cpu.sp - 1, val64);
             cpu.sp += 7;
             cpu.pc++;
             break;
         case 41:
-            val8 = readMem(1, cpu.sp - 1, 2);
+            val8 = readMem(1, cpu.sp - 1);
             valFloat = (float) val8;
             val32 = *((int32_t*)&valFloat);
             writeStackVal(4, cpu.sp - 1, val32);
@@ -495,7 +440,7 @@ void interpret(uint8_t opcode, int64_t intIn, double floatIn, int8_t secondParam
             cpu.pc++;
             break;
         case 42:
-            val8 = readMem(1, cpu.sp - 1, 2);
+            val8 = readMem(1, cpu.sp - 1);
             valDouble = (double) val8;
             val64 = *((int64_t*)&valDouble);
             writeStackVal(8, cpu.sp - 1, val64);
@@ -503,25 +448,25 @@ void interpret(uint8_t opcode, int64_t intIn, double floatIn, int8_t secondParam
             cpu.pc++;
             break;
         case 43:
-            val8 = (int8_t) readMem(2, cpu.sp - 2, 2);
+            val8 = (int8_t) readMem(2, cpu.sp - 2);
             writeStackVal(1, cpu.sp - 2, val8);
             cpu.sp--;
             cpu.pc++;
             break;
         case 44:
-            val32 = (int32_t) readMem(2, cpu.sp - 2, 2);
+            val32 = (int32_t) readMem(2, cpu.sp - 2);
             writeStackVal(4, cpu.sp - 2, val32);
             cpu.sp += 2;
             cpu.pc++;
             break;
         case 45:
-            val64 = (int64_t) readMem(2, cpu.sp - 2, 2);
+            val64 = (int64_t) readMem(2, cpu.sp - 2);
             writeStackVal(8, cpu.sp - 2, val64);
             cpu.sp += 6;
             cpu.pc++;
             break;
         case 46:
-            val16 = readMem(2, cpu.sp - 2, 2);
+            val16 = readMem(2, cpu.sp - 2);
             valFloat = (float) val16;
             val32 = *((int32_t*)&valFloat);
             writeStackVal(4, cpu.sp - 1, val32);
@@ -529,7 +474,7 @@ void interpret(uint8_t opcode, int64_t intIn, double floatIn, int8_t secondParam
             cpu.pc++;
             break;
         case 47:
-            val16 = readMem(2, cpu.sp - 2, 2);
+            val16 = readMem(2, cpu.sp - 2);
             valDouble = (double) val16;
             val64 = *((int64_t*)&valDouble);
             writeStackVal(8, cpu.sp - 1, val64);
@@ -537,32 +482,32 @@ void interpret(uint8_t opcode, int64_t intIn, double floatIn, int8_t secondParam
             cpu.pc++;
             break;
         case 48:
-            val8 = (int8_t) readMem(4, cpu.sp - 4, 2);
+            val8 = (int8_t) readMem(4, cpu.sp - 4);
             writeStackVal(1, cpu.sp - 4, val8);
             cpu.sp -= 3;
             cpu.pc++;
             break;
         case 49:
-            val16 = (int16_t) readMem(4, cpu.sp - 4, 2);
+            val16 = (int16_t) readMem(4, cpu.sp - 4);
             writeStackVal(2, cpu.sp - 4, val16);
             cpu.sp -= 2;
             cpu.pc++;
             break;
         case 50:
-            val64 = (int64_t) readMem(4, cpu.sp - 4, 2);
+            val64 = (int64_t) readMem(4, cpu.sp - 4);
             writeStackVal(8, cpu.sp - 4, val64);
             cpu.sp += 4;
             cpu.pc++;
             break;
         case 51:
-            val32 = readMem(4, cpu.sp - 4, 2);
+            val32 = readMem(4, cpu.sp - 4);
             valFloat = (float) val32;
             val32 = *((int32_t*)&valFloat);
             writeStackVal(4, cpu.sp - 4, val32);
             cpu.pc++;
             break;
         case 52:
-            val32 = readMem(4, cpu.sp - 4, 2);
+            val32 = readMem(4, cpu.sp - 4);
             valDouble = (double) val32;
             val64 = *((int64_t*)&valDouble);
             writeStackVal(8, cpu.sp - 4, val64);
@@ -570,25 +515,25 @@ void interpret(uint8_t opcode, int64_t intIn, double floatIn, int8_t secondParam
             cpu.pc++;
             break;
         case 53:
-            val8 = (int8_t) readMem(8, cpu.sp - 8, 2);
+            val8 = (int8_t) readMem(8, cpu.sp - 8);
             writeStackVal(1, cpu.sp - 8, val8);
             cpu.sp -= 7;
             cpu.pc++;
             break;
         case 54:
-            val16 = (int16_t) readMem(8, cpu.sp - 8, 2);
+            val16 = (int16_t) readMem(8, cpu.sp - 8);
             writeStackVal(2, cpu.sp - 8, val16);
             cpu.sp -= 6;
             cpu.pc++;
             break;
         case 55:
-            val32 = (int32_t) readMem(8, cpu.sp - 8, 2);
+            val32 = (int32_t) readMem(8, cpu.sp - 8);
             writeStackVal(4, cpu.sp - 8, val32);
             cpu.sp -= 3;
             cpu.pc++;
             break;
         case 57:
-            val64 = readMem(8, cpu.sp - 8, 2);
+            val64 = readMem(8, cpu.sp - 8);
             valFloat = (float) val64;
             val32 = *((float*)&valFloat);
             writeStackVal(4, cpu.sp - 8, val32);
@@ -596,41 +541,41 @@ void interpret(uint8_t opcode, int64_t intIn, double floatIn, int8_t secondParam
             cpu.pc++;
             break;
         case 58:
-            val64 = readMem(8, cpu.sp - 8, 2);
+            val64 = readMem(8, cpu.sp - 8);
             valDouble = (double) val64;
             val64 = *((double*)&valDouble);
             writeStackVal(8, cpu.sp - 8, val64);
             cpu.pc++;
             break;
         case 59:
-            valFloat = readMemFloat(4, cpu.sp - 4, 2);
+            valFloat = readMemFloat(4, cpu.sp - 4);
             val8 = (int8_t) valFloat;
             writeStackVal(1, cpu.sp - 4, val8);
             cpu.sp -= 3;
             cpu.pc++;
             break;
         case 60:
-            valFloat = readMemFloat(4, cpu.sp - 4, 2);
+            valFloat = readMemFloat(4, cpu.sp - 4);
             val16 = (int16_t) valFloat;
             writeStackVal(2, cpu.sp - 4, val16);
             cpu.sp -= 2;
             cpu.pc++;
             break;
         case 61:
-            valFloat = readMemFloat(4, cpu.sp - 4, 2);
+            valFloat = readMemFloat(4, cpu.sp - 4);
             val32 = (int32_t) valFloat;
             writeStackVal(4, cpu.sp - 4, val32);
             cpu.pc++;
             break;
         case 62:
-            valFloat = readMemFloat(4, cpu.sp - 4, 2);
+            valFloat = readMemFloat(4, cpu.sp - 4);
             val64 = (int64_t) valFloat;
             writeStackVal(8, cpu.sp - 4, val64);
             cpu.sp += 4;
             cpu.pc++;
             break;
         case 63:
-            valFloat = readMemFloat(4, cpu.sp - 4, 2);
+            valFloat = readMemFloat(4, cpu.sp - 4);
             valDouble = (double) valFloat;
             val64 = *((int64_t*)&valDouble);
             writeStackVal(8, cpu.sp - 4, val64);
@@ -638,34 +583,34 @@ void interpret(uint8_t opcode, int64_t intIn, double floatIn, int8_t secondParam
             cpu.pc++;
             break;
         case 64:
-            valDouble = readMemDouble(8, cpu.sp - 8, 2);
+            valDouble = readMemDouble(8, cpu.sp - 8);
             val8 = (int8_t) valDouble;
             writeStackVal(1, cpu.sp - 8, val8);
             cpu.sp -= 7;
             cpu.pc++;
             break;
         case 65:
-            valDouble = readMemDouble(8, cpu.sp - 8, 2);
+            valDouble = readMemDouble(8, cpu.sp - 8);
             val16 = (int16_t) valDouble;
             writeStackVal(2, cpu.sp - 8, val16);
             cpu.sp -= 6;
             cpu.pc++;
             break;
         case 66:
-            valDouble = readMemDouble(8, cpu.sp - 8, 2);
+            valDouble = readMemDouble(8, cpu.sp - 8);
             val32 = (int32_t) valDouble;
             writeStackVal(4, cpu.sp - 8, val32);
             cpu.sp -= 4;
             cpu.pc++;
             break;
         case 67:
-            valDouble = readMemDouble(8, cpu.sp - 8, 2);
+            valDouble = readMemDouble(8, cpu.sp - 8);
             val64 = (int64_t) valDouble;
             writeStackVal(8, cpu.sp - 8, val64);
             cpu.pc++;
             break;
         case 68:
-            valDouble = readMemDouble(8, cpu.sp - 8, 2);
+            valDouble = readMemDouble(8, cpu.sp - 8);
             valFloat = (float) valDouble;
             val32 = *((int32_t*)&valFloat);
             writeStackVal(4, cpu.sp - 8, val32);
@@ -728,329 +673,329 @@ void interpret(uint8_t opcode, int64_t intIn, double floatIn, int8_t secondParam
             cpu.pc++;
             break;
         case 76:
-            val8 = readMem(1, cpu.sp - 1, 2);
+            val8 = readMem(1, cpu.sp - 1);
             printf("%c\n", val8);
             cpu.sp--;
             cpu.pc++;
             break;
         case 77:
-            val8 = readMem(1, cpu.sp - 1, 2);
+            val8 = readMem(1, cpu.sp - 1);
             printf("%hhd\n", val8);
             cpu.sp--;
             cpu.pc++;
             break;
         case 78:
-            val16 = readMem(2, cpu.sp - 2, 2);
+            val16 = readMem(2, cpu.sp - 2);
             printf("%hd\n", val16);
             cpu.sp -= 2;
             cpu.pc++;
             break;
         case 79:
-            val32 = readMem(4, cpu.sp - 4, 2);
+            val32 = readMem(4, cpu.sp - 4);
             printf("%d\n", val32);
             cpu.sp -= 4;
             cpu.pc++;
             break;
         case 80:
-            val64 = readMem(8, cpu.sp - 8, 2);
+            val64 = readMem(8, cpu.sp - 8);
             printf("%ld\n", val64);
             cpu.sp -= 8;
             cpu.pc++;
             break;
         case 81:
-            valFloat = readMemFloat(4, cpu.sp - 4, 2);
+            valFloat = readMemFloat(4, cpu.sp - 4);
             printf("%f\n", valFloat);
             cpu.sp -= 4;
             cpu.pc++;
             break;
         case 82:
-            valDouble = readMemDouble(8, cpu.sp - 8, 2);
+            valDouble = readMemDouble(8, cpu.sp - 8);
             printf("%lf\n", valDouble);
             cpu.sp -= 8;
             cpu.pc++;
             break;
         //TODO: Check for overflow
         case 83:
-            val8 = readMem(1, cpu.sp - 1, 2) + readMem(1, cpu.sp - 2, 2);
+            val8 = readMem(1, cpu.sp - 1) + readMem(1, cpu.sp - 2);
             writeStackVal(1, cpu.sp - 2, val8);
             cpu.sp--;
             cpu.pc++;
             break;
         case 84:
-            val16 = readMem(2, cpu.sp - 2, 2) + readMem(2, cpu.sp - 4, 2);
+            val16 = readMem(2, cpu.sp - 2) + readMem(2, cpu.sp - 4);
             writeStackVal(2, cpu.sp - 4, val16);
             cpu.sp -= 2;
             cpu.pc++;
             break;
         case 85:
-            val32 = readMem(8, cpu.sp - 4, 2) + readMem(8, cpu.sp - 8, 2);
+            val32 = readMem(8, cpu.sp - 4) + readMem(8, cpu.sp - 8);
             writeStackVal(4, cpu.sp - 8, val32);
             cpu.sp -= 4;
             cpu.pc++;
             break;
         case 86:
-            val64 = readMem(8, cpu.sp - 8, 2) + readMem(8, cpu.sp - 16, 2);
+            val64 = readMem(8, cpu.sp - 8) + readMem(8, cpu.sp - 16);
             writeStackVal(8, cpu.sp - 16, val64);
             cpu.sp -= 8;
             cpu.pc++;
             break;
         case 87:
-            valFloat = readMemFloat(8, cpu.sp - 4, 2) + readMemFloat(8, cpu.sp - 8, 2);
+            valFloat = readMemFloat(8, cpu.sp - 4) + readMemFloat(8, cpu.sp - 8);
             val32 = *((int32_t*) &valFloat);
             writeStackVal(4, cpu.sp - 8, val32);
             cpu.sp -= 4;
             cpu.pc++;
             break;
         case 88:
-            valDouble = readMemDouble(8, cpu.sp - 8, 2) + readMemDouble(8, cpu.sp - 16, 2);
+            valDouble = readMemDouble(8, cpu.sp - 8) + readMemDouble(8, cpu.sp - 16);
             val64 = *((int64_t*) &valDouble);
             writeStackVal(8, cpu.sp - 16, val64);
             cpu.sp -= 8;
             cpu.pc++;
             break;
         case 89:
-            val8 = readMem(1, cpu.sp - 2, 2) - readMem(1, cpu.sp - 1, 2);
+            val8 = readMem(1, cpu.sp - 2) - readMem(1, cpu.sp - 1);
             writeStackVal(1, cpu.sp - 2, val8);
             cpu.sp--;
             cpu.pc++;
             break;
         case 90:
-            val16 = readMem(2, cpu.sp - 4, 2) - readMem(2, cpu.sp - 2, 2);
+            val16 = readMem(2, cpu.sp - 4) - readMem(2, cpu.sp - 2);
             writeStackVal(2, cpu.sp - 4, val16);
             cpu.sp -= 2;
             cpu.pc++;
             break;
         case 91:
-            val32 = readMem(4, cpu.sp - 8, 2) - readMem(4, cpu.sp - 4, 2);
+            val32 = readMem(4, cpu.sp - 8) - readMem(4, cpu.sp - 4);
             writeStackVal(4, cpu.sp - 8, val32);
             cpu.sp -= 4;
             cpu.pc++;
             break;
         case 92:
-            val64 = readMem(8, cpu.sp - 16, 2) - readMem(8, cpu.sp - 8, 2);
+            val64 = readMem(8, cpu.sp - 16) - readMem(8, cpu.sp - 8);
             writeStackVal(8, cpu.sp - 16, val64);
             cpu.sp -= 8;
             cpu.pc++;
             break;
         case 93:
-            valFloat = readMemFloat(4, cpu.sp - 8, 2) - readMemFloat(4, cpu.sp - 4, 2);
+            valFloat = readMemFloat(4, cpu.sp - 8) - readMemFloat(4, cpu.sp - 4);
             val32 = *((int32_t*)&valFloat);
             writeStackVal(4, cpu.sp - 8, val32);
             cpu.sp -= 4;
             cpu.pc++;
             break;
         case 94:
-            valDouble = readMemDouble(8, cpu.sp - 16, 2) - readMemDouble(8, cpu.sp - 8, 2);
+            valDouble = readMemDouble(8, cpu.sp - 16) - readMemDouble(8, cpu.sp - 8);
             val64 = *((int64_t*)&valDouble);
             writeStackVal(8, cpu.sp - 16, val64);
             cpu.sp -= 8;
             cpu.pc++;
             break;
         case 95:
-            val8 = readMem(1, cpu.sp - 2, 2) * readMem(1, cpu.sp - 1, 2);
+            val8 = readMem(1, cpu.sp - 2) * readMem(1, cpu.sp - 1);
             writeStackVal(1, cpu.sp - 2, val8);
             cpu.sp--;
             cpu.pc++;
             break;
         case 96:
-            val16 = readMem(2, cpu.sp - 4, 2) * readMem(2, cpu.sp - 2, 2);
+            val16 = readMem(2, cpu.sp - 4) * readMem(2, cpu.sp - 2);
             writeStackVal(2, cpu.sp - 4, val16);
             cpu.sp -= 2;
             cpu.pc++;
             break;
         case 97:
-            val32 = readMem(4, cpu.sp - 8, 2) * readMem(4, cpu.sp - 4, 2);
+            val32 = readMem(4, cpu.sp - 8) * readMem(4, cpu.sp - 4);
             writeStackVal(4, cpu.sp - 8, val32);
             cpu.sp -= 4;
             cpu.pc++;
             break;
         case 98:
-            val64 = readMem(8, cpu.sp - 16, 2) * readMem(8, cpu.sp - 8, 2);
+            val64 = readMem(8, cpu.sp - 16) * readMem(8, cpu.sp - 8);
             writeStackVal(8, cpu.sp - 16, val64);
             cpu.sp -= 8;
             cpu.pc++;
             break;
         case 99:
-            valFloat = readMemFloat(4, cpu.sp - 8, 2) * readMemFloat(4, cpu.sp - 4, 2);
+            valFloat = readMemFloat(4, cpu.sp - 8) * readMemFloat(4, cpu.sp - 4);
             val32 = *((int32_t*)&valFloat);
             writeStackVal(4, cpu.sp - 8, val32);
             cpu.sp -= 4;
             cpu.pc++;
             break;
         case 100:
-            valDouble = readMemDouble(8, cpu.sp - 16, 2) * readMemDouble(8, cpu.sp - 8, 2);
+            valDouble = readMemDouble(8, cpu.sp - 16) * readMemDouble(8, cpu.sp - 8);
             val64 = *((int64_t*)&valDouble);
             writeStackVal(8, cpu.sp - 16, val64);
             cpu.sp -= 8;
             cpu.pc++;
             break;
         case 101:
-            val8 = readMem(1, cpu.sp - 2, 2) / readMem(1, cpu.sp - 1, 2);
+            val8 = readMem(1, cpu.sp - 2) / readMem(1, cpu.sp - 1);
             writeStackVal(1, cpu.sp - 2, val8);
             cpu.sp--;
             cpu.pc++;
             break;
         case 102:
-            val16 = readMem(2, cpu.sp - 4, 2) / readMem(2, cpu.sp - 2, 2);
+            val16 = readMem(2, cpu.sp - 4) / readMem(2, cpu.sp - 2);
             writeStackVal(2, cpu.sp - 4, val16);
             cpu.sp -= 2;
             cpu.pc++;
             break;
         case 103:
-            val32 = readMem(4, cpu.sp - 8, 2) / readMem(4, cpu.sp - 4, 2);
+            val32 = readMem(4, cpu.sp - 8) / readMem(4, cpu.sp - 4);
             writeStackVal(4, cpu.sp - 8, val32);
             cpu.sp -= 4;
             cpu.pc++;
             break;
         case 104:
-            val64 = readMem(8, cpu.sp - 16, 2) / readMem(8, cpu.sp - 8, 2);
+            val64 = readMem(8, cpu.sp - 16) / readMem(8, cpu.sp - 8);
             writeStackVal(8, cpu.sp - 16, val64);
             cpu.sp -= 8;
             cpu.pc++;
             break;
         case 105:
-            valFloat = readMemFloat(4, cpu.sp - 8, 2) / readMemFloat(4, cpu.sp - 4, 2);
+            valFloat = readMemFloat(4, cpu.sp - 8) / readMemFloat(4, cpu.sp - 4);
             val32 = *((int32_t*)&valFloat);
             writeStackVal(4, cpu.sp - 8, val32);
             cpu.sp -= 4;
             cpu.pc++;
             break;
         case 106:
-            valDouble = readMemDouble(8, cpu.sp - 16, 2) / readMemDouble(8, cpu.sp - 8, 2);
+            valDouble = readMemDouble(8, cpu.sp - 16) / readMemDouble(8, cpu.sp - 8);
             val64 = *((int64_t*)&valDouble);
             writeStackVal(8, cpu.sp - 16, val64);
             cpu.sp -= 8;
             cpu.pc++;
             break;
         case 107:
-            val8 = readMem(1, cpu.sp - 2, 2) & readMem(1, cpu.sp - 1, 2);
+            val8 = readMem(1, cpu.sp - 2) & readMem(1, cpu.sp - 1);
             writeStackVal(1, cpu.sp - 2, val8);
             cpu.sp--;
             cpu.pc++;
             break;
         case 108:
-            val16 = readMem(2, cpu.sp - 4, 2) & readMem(2, cpu.sp - 2, 2);
+            val16 = readMem(2, cpu.sp - 4) & readMem(2, cpu.sp - 2);
             writeStackVal(2, cpu.sp - 4, val16);
             cpu.sp -= 2;
             cpu.pc++;
             break;
         case 109:
-            val32 = readMem(4, cpu.sp - 8, 2) & readMem(4, cpu.sp - 4, 2);
+            val32 = readMem(4, cpu.sp - 8) & readMem(4, cpu.sp - 4);
             writeStackVal(4, cpu.sp - 8, val32);
             cpu.sp -= 4;
             cpu.pc++;
             break;
         case 110:
-            val64 = readMem(8, cpu.sp - 16, 2) & readMem(8, cpu.sp - 8, 2);
+            val64 = readMem(8, cpu.sp - 16) & readMem(8, cpu.sp - 8);
             writeStackVal(8, cpu.sp - 16, val64);
             cpu.sp -= 8;
             cpu.pc++;
             break;
         case 111:
-            val8 = readMem(1, cpu.sp - 2, 2) | readMem(1, cpu.sp - 1, 2);
+            val8 = readMem(1, cpu.sp - 2) | readMem(1, cpu.sp - 1);
             writeStackVal(1, cpu.sp - 2, val8);
             cpu.sp--;
             cpu.pc++;
             break;
         case 112:
-            val16 = readMem(2, cpu.sp - 4, 2) | readMem(2, cpu.sp - 2, 2);
+            val16 = readMem(2, cpu.sp - 4) | readMem(2, cpu.sp - 2);
             writeStackVal(2, cpu.sp - 4, val16);
             cpu.sp -= 2;
             cpu.pc++;
             break;
         case 113:
-            val32 = readMem(4, cpu.sp - 8, 2) | readMem(4, cpu.sp - 4, 2);
+            val32 = readMem(4, cpu.sp - 8) | readMem(4, cpu.sp - 4);
             writeStackVal(4, cpu.sp - 8, val32);
             cpu.sp -= 4;
             cpu.pc++;
             break;
         case 114:
-            val64 = readMem(8, cpu.sp - 16, 2) | readMem(8, cpu.sp - 8, 2);
+            val64 = readMem(8, cpu.sp - 16) | readMem(8, cpu.sp - 8);
             writeStackVal(8, cpu.sp - 16, val64);
             cpu.sp -= 8;
             cpu.pc++;
             break;
         case 115:
-            val8 = readMem(1, cpu.sp - 2, 2) ^ readMem(1, cpu.sp - 1, 2);
+            val8 = readMem(1, cpu.sp - 2) ^ readMem(1, cpu.sp - 1);
             writeStackVal(1, cpu.sp - 2, val8);
             cpu.sp--;
             cpu.pc++;
             break;
         case 116:
-            val16 = readMem(2, cpu.sp - 4, 2) ^ readMem(2, cpu.sp - 2, 2);
+            val16 = readMem(2, cpu.sp - 4) ^ readMem(2, cpu.sp - 2);
             writeStackVal(2, cpu.sp - 4, val16);
             cpu.sp -= 2;
             cpu.pc++;
             break;
         case 117:
-            val32 = readMem(4, cpu.sp - 8, 2) ^ readMem(4, cpu.sp - 4, 2);
+            val32 = readMem(4, cpu.sp - 8) ^ readMem(4, cpu.sp - 4);
             writeStackVal(4, cpu.sp - 8, val32);
             cpu.sp -= 4;
             cpu.pc++;
             break;
         case 118:
-            val64 = readMem(8, cpu.sp - 16, 2) ^ readMem(8, cpu.sp - 8, 2);
+            val64 = readMem(8, cpu.sp - 16) ^ readMem(8, cpu.sp - 8);
             writeStackVal(8, cpu.sp - 16, val64);
             cpu.sp -= 8;
             cpu.pc++;
             break;
         case 119:
-            val8 = ~readMem(1, cpu.sp - 2, 2);
+            val8 = ~readMem(1, cpu.sp - 2);
             writeStackVal(1, cpu.sp - 2, val8);
             cpu.pc++;
             break;
         case 120:
-            val16 = ~readMem(2, cpu.sp - 4, 2);
+            val16 = ~readMem(2, cpu.sp - 4);
             writeStackVal(2, cpu.sp - 4, val16);
             cpu.pc++;
             break;
         case 121:
-            val32 = ~readMem(4, cpu.sp - 8, 2);
+            val32 = ~readMem(4, cpu.sp - 8);
             writeStackVal(4, cpu.sp - 8, val32);
             cpu.pc++;
             break;
         case 122:
-            val64 = ~readMem(8, cpu.sp - 16, 2);
+            val64 = ~readMem(8, cpu.sp - 16);
             writeStackVal(8, cpu.sp - 16, val64);
             cpu.pc++;
             break;
         case 123:
-            val8 = readMem(1, cpu.sp - 2, 2) >> intIn;
+            val8 = readMem(1, cpu.sp - 2) >> intIn;
             writeStackVal(1, cpu.sp - 2, val8);
             cpu.pc += 2;
             break;
         case 124:
-            val16 = ~readMem(2, cpu.sp - 4, 2) >> intIn;
+            val16 = ~readMem(2, cpu.sp - 4) >> intIn;
             writeStackVal(2, cpu.sp - 4, val16);
             cpu.pc += 2;
             break;
         case 125:
-            val32 = ~readMem(4, cpu.sp - 8, 2) >> intIn;
+            val32 = ~readMem(4, cpu.sp - 8) >> intIn;
             writeStackVal(4, cpu.sp - 8, val32);
             cpu.pc += 2;
             break;
         case 126:
-            val64 = ~readMem(8, cpu.sp - 16, 2) >> intIn;
+            val64 = ~readMem(8, cpu.sp - 16) >> intIn;
             writeStackVal(8, cpu.sp - 16, val64);
             cpu.pc += 2;
             break;
         case 127:
-            val8 = readMem(1, cpu.sp - 2, 2) << intIn;
+            val8 = readMem(1, cpu.sp - 2) << intIn;
             writeStackVal(1, cpu.sp - 2, val8);
             cpu.pc += 2;
             break;
         case 128:
-            val16 = ~readMem(2, cpu.sp - 4, 2) << intIn;
+            val16 = ~readMem(2, cpu.sp - 4) << intIn;
             writeStackVal(2, cpu.sp - 4, val16);
             cpu.pc += 2;
             break;
         case 129:
-            val32 = ~readMem(4, cpu.sp - 8, 2) << intIn;
+            val32 = ~readMem(4, cpu.sp - 8) << intIn;
             writeStackVal(4, cpu.sp - 8, val32);
             cpu.pc += 2;
             break;
         case 130:
-            val64 = ~readMem(8, cpu.sp - 16, 2) << intIn;
+            val64 = ~readMem(8, cpu.sp - 16) << intIn;
             writeStackVal(8, cpu.sp - 16, val64);
             cpu.pc += 2;
             break;
@@ -1063,12 +1008,12 @@ void interpret(uint8_t opcode, int64_t intIn, double floatIn, int8_t secondParam
             cpu.pc += intIn;
             break;
         case 133:
-            val32 = readMem(4, cpu.sp - 4, 2);
+            val32 = readMem(4, cpu.sp - 4);
             memCheck(val32);
             cpu.pc = val32;
             break;
         case 134:
-            val32 = readMem(4, cpu.sp - 4, 2);
+            val32 = readMem(4, cpu.sp - 4);
             if(val32 == 0){
                 cpu.pc = intIn;
             }
@@ -1077,7 +1022,7 @@ void interpret(uint8_t opcode, int64_t intIn, double floatIn, int8_t secondParam
             }
             break;
         case 135:
-            val32 = readMem(4, cpu.sp - 4, 2);
+            val32 = readMem(4, cpu.sp - 4);
             if(val32 != 0){
                 cpu.pc = intIn;
             }
@@ -1086,7 +1031,7 @@ void interpret(uint8_t opcode, int64_t intIn, double floatIn, int8_t secondParam
             }
             break;
         case 136:
-            val32 = readMem(4, cpu.sp - 4, 2);
+            val32 = readMem(4, cpu.sp - 4);
             if(val32 > 0){
                 cpu.pc = intIn;
             }
@@ -1095,7 +1040,7 @@ void interpret(uint8_t opcode, int64_t intIn, double floatIn, int8_t secondParam
             }
             break;
         case 137:
-            val32 = readMem(4, cpu.sp - 4, 2);
+            val32 = readMem(4, cpu.sp - 4);
             if(val32 < 0){
                 cpu.pc = intIn;
             }
@@ -1104,7 +1049,7 @@ void interpret(uint8_t opcode, int64_t intIn, double floatIn, int8_t secondParam
             }
             break;
         case 138:
-            val32 = readMem(4, cpu.sp - 4, 2);
+            val32 = readMem(4, cpu.sp - 4);
             if(val32 >= 0){
                 cpu.pc = intIn;
             }
@@ -1113,7 +1058,7 @@ void interpret(uint8_t opcode, int64_t intIn, double floatIn, int8_t secondParam
             }
             break;
         case 139:
-            val32 = readMem(4, cpu.sp - 4, 2);
+            val32 = readMem(4, cpu.sp - 4);
             if(val32 <= 0){
                 cpu.pc = intIn;
             }
@@ -1128,7 +1073,7 @@ void interpret(uint8_t opcode, int64_t intIn, double floatIn, int8_t secondParam
             break;
         case 141:
             cpu.sp -= 4;
-            cpu.pc = readMem(8, cpu.sp, 2);
+            cpu.pc = readMem(8, cpu.sp);
             break;
     }
 }
@@ -1162,32 +1107,32 @@ void readBinary(FILE* f){
             case 0:
             case 123 ... 130:
             case 132:
-                intIn = readMem(1, cpu.pc + 1, 0);
+                intIn = readMem(1, cpu.pc + 1);
                 break;
             case 1:
-                intIn = readMem(2, cpu.pc + 1, 0);
+                intIn = readMem(2, cpu.pc + 1);
                 break;
             case 2:
-                intIn = readMem(4, cpu.pc + 1, 0);
+                intIn = readMem(4, cpu.pc + 1);
                 break;
             case 3:
-                intIn = readMem(8, cpu.pc + 1, 0);
+                intIn = readMem(8, cpu.pc + 1);
                 break;
             case 4:
-                floatIn = readMemFloat(4, cpu.pc + 1, 0);
+                floatIn = readMemFloat(4, cpu.pc + 1);
                 break;
             case 5:
-                floatIn = readMemDouble(8, cpu.pc + 1, 0);
+                floatIn = readMemDouble(8, cpu.pc + 1);
                 break;
             case 6 ... 11:
             case 25 ... 30:
             case 131:
             case 134 ... 140:
-                intIn = readMem(3, cpu.pc + 1, 0);
+                intIn = readMem(3, cpu.pc + 1);
                 break;
             case 12:
             case 31:
-                secondParam = readMem(1, cpu.pc + 4, 0);
+                secondParam = readMem(1, cpu.pc + 4);
                 break;
             case 142:
                 exit(0);
