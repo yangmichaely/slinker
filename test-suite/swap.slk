@@ -1,0 +1,6 @@
+.code
+	pushb 1
+	pushb 2
+	swapb
+	outb
+	halt

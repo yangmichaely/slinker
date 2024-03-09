@@ -35,7 +35,7 @@ float floatCheck(char* in);
 
 double doubleCheck(char* in);
 
-void interpret(uint8_t opcode, uint64_t intIn, double floatIn, int8_t secondParam);
+void interpret(uint8_t opcode, int64_t intIn, double floatIn, int8_t secondParam);
 
 int64_t readMem(int numRead, int ind, int codeHeapStack);
 
