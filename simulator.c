@@ -460,12 +460,12 @@ void interpret(uint8_t opcode, int64_t intIn, double floatIn, int8_t secondParam
             cpu.pc++;
             break;
         case 37:
-            valDouble = readMemFloat(8, cpu.sp - 8, 2);
+            valDouble = readMemDouble(8, cpu.sp - 8, 2);
             val64 = *((int64_t*)&valDouble);
             double tmpDouble = readMemDouble(8, cpu.sp - 16, 2);
             tmp64 = *((int64_t*)&tmpDouble);
-            writeStackVal(4, cpu.sp - 8, val64);
-            writeStackVal(4, cpu.sp - 4, tmp64);
+            writeStackVal(8, cpu.sp - 16, val64);
+            writeStackVal(8, cpu.sp - 8, tmp64);
             cpu.pc++;
             break;
         case 38:
@@ -1193,11 +1193,11 @@ void readBinary(FILE* f){
             case 142:
                 exit(0);
         }
-        // printf("ITERATION START\n");
-        // printf("opcode: %d\n", opcode);
-        // printf("intIn: %ld\n", intIn);
-        // printf("secondParam: %d\n", secondParam);
-        // printf("floatIn: %f\n", floatIn);
+        printf("ITERATION START\n");
+        printf("opcode: %d\n", opcode);
+        printf("intIn: %ld\n", intIn);
+        printf("secondParam: %d\n", secondParam);
+        printf("floatIn: %f\n", floatIn);
         interpret(opcode, intIn, floatIn, secondParam);
     }
     EXIT_ERROR();

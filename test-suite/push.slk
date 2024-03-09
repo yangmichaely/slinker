@@ -1,4 +1,6 @@
 .code
-	pushs 32766
-	outs
+	pushd -50.0
+	pushd -51.0
+	swapd
+	outd
 	halt
