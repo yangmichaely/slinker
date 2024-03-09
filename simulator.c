@@ -224,17 +224,17 @@ void interpret(uint8_t opcode, int64_t intIn, double floatIn, int8_t secondParam
     char* in = (char*) calloc (sizeof(char) * 50, 1);
     switch(opcode){
         case 0:
-            writeStackVal(1, cpu.sp, intIn);
+            writeStackVal(1, cpu.sp, (int8_t) intIn);
             cpu.sp++;
             cpu.pc += 2;
             break;
         case 1:
-            writeStackVal(2, cpu.sp, intIn);
+            writeStackVal(2, cpu.sp, (int16_t) intIn);
             cpu.sp += 2;
             cpu.pc += 3;
             break;
         case 2:
-            writeStackVal(4, cpu.sp, intIn);
+            writeStackVal(4, cpu.sp, (int32_t) intIn);
             cpu.sp += 4;
             cpu.pc += 5;
             break;
