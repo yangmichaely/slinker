@@ -277,7 +277,7 @@ void interpret(uint8_t opcode, int64_t intIn, double floatIn, int8_t secondParam
         case 9:
             val64 = readMem(8, intIn, 1);
             writeStackVal(8, cpu.sp, val64);
-            cpu.sp += 8;
+            cpu.sp += 1;
             cpu.pc += 4;
             break;
         case 10:
