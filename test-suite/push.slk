@@ -1,6 +1,10 @@
 .code
-	pushd -50.0
-	pushd -51.0
-	swapd
-	outd
+	pushdm :N0
+	pushd -128
+	popdm :N0
+	outb
 	halt
+.data
+.byte
+:N0
+	-50

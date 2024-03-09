@@ -1184,7 +1184,6 @@ void readBinary(FILE* f){
             case 131:
             case 134 ... 140:
                 intIn = readMem(3, cpu.pc + 1, 0);
-                printf("intin: %ld\n", intIn);
                 break;
             case 12:
             case 31:
