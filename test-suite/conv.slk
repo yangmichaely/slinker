@@ -1,0 +1,8 @@
+.code
+	pushb -128
+	convbd
+	pushb 127
+	convbd
+	addd
+	outd
+	halt

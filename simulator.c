@@ -39,25 +39,25 @@ void EXIT_ERROR(){
 }
 
 void memCheck(uint64_t index){
-    if(index < 0 || index >= HEAP_START){
+    if(index < 0 || index >= MEM_SIZE){
         EXIT_ERROR();
     }
 }
 
-void stackCheck(uint64_t index){
-    if(index < STACK_START || index >= MEM_SIZE){
-        EXIT_ERROR();
-    }
-}
+// void memCheck(uint64_t index){
+//     if(index < STACK_START || index >= MEM_SIZE){
+//         EXIT_ERROR();
+//     }
+// }
 
-void heapCheck(uint64_t index){
-    if(index < HEAP_START || index >= STACK_START){
-        EXIT_ERROR();
-    }
-}
+// void memCheck(uint64_t index){
+//     if(index < HEAP_START || index >= STACK_START){
+//         EXIT_ERROR();
+//     }
+// }
 
 void writeStackVal(int numBytes, int ind, int64_t value){
-    stackCheck(ind + numBytes - 1);
+    memCheck(ind + numBytes - 1);
     for(int i = ind + numBytes - 1; i >= ind; i--){
         cpu.mem[i] = value & 0xff;
         value >>= 8;
@@ -65,7 +65,7 @@ void writeStackVal(int numBytes, int ind, int64_t value){
 }
 
 void writeHeapVal(int numBytes, int ind, int64_t value){
-    heapCheck(ind + numBytes - 1);
+    memCheck(ind + numBytes - 1);
     for(int i = numBytes - 1; i >= 0; i--){
         cpu.mem[ind + i] = value >> (((numBytes - 1 - i) * 8) & 0xff);
     }
@@ -80,10 +80,10 @@ void writeStackMem(int numBytes, int ind, int readInd, int readStackHeap, int wr
         value = readMem(numBytes, readInd, 2);
     }
     if(writeStackHeap == 0){
-        stackCheck(ind + numBytes - 1);
+        memCheck(ind + numBytes - 1);
     }
     else{
-        heapCheck(ind + numBytes - 1);
+        memCheck(ind + numBytes - 1);
     }
     for(int i = numBytes - 1; i >= 0; i--){
         cpu.mem[ind + i] = value >> (((numBytes - 1 - i) * 8) & 0xff);
@@ -95,10 +95,10 @@ int64_t readMem(int numRead, int ind, int codeHeapStack){
         memCheck(ind + numRead - 1);
     }
     else if(codeHeapStack == 1){
-        heapCheck(ind + numRead - 1);
+        memCheck(ind + numRead - 1);
     }
     else{
-        stackCheck(ind + numRead - 1);
+        memCheck(ind + numRead - 1);
     }
     int64_t ans = 0;
     for(int i = ind; i < ind + numRead; i++){
@@ -112,16 +112,16 @@ float readMemFloat(int numRead, int ind, int codeHeapStack){
         memCheck(ind + numRead - 1);
     }
     else if(codeHeapStack == 1){
-        heapCheck(ind + numRead - 1);
+        memCheck(ind + numRead - 1);
     }
     else{
-        stackCheck(ind + numRead - 1);
+        memCheck(ind + numRead - 1);
     }
     int32_t ans = 0;
     for(int i = ind; i < ind + numRead; i++){
         ans = (ans << 8) | cpu.mem[i];
     }
-    float d = *((float*)&ans);
+    float d = *((float*) &ans);
     return d;
 }
 
@@ -130,10 +130,10 @@ double readMemDouble(int numRead, int ind, int codeHeapStack){
         memCheck(ind + numRead - 1);
     }
     else if(codeHeapStack == 1){
-        heapCheck(ind + numRead - 1);
+        memCheck(ind + numRead - 1);
     }
     else{
-        stackCheck(ind + numRead - 1);
+        memCheck(ind + numRead - 1);
     }
     int64_t ans = 0;
     for(int i = ind; i < ind + numRead; i++){
@@ -414,8 +414,8 @@ void interpret(uint8_t opcode, int64_t intIn, double floatIn, int8_t secondParam
             cpu.pc += 4;
             break;
         case 31:
-            stackCheck(cpu.sp + secondParam - 1);
-            heapCheck(intIn + secondParam - 1);
+            memCheck(cpu.sp + secondParam - 1);
+            memCheck(intIn + secondParam - 1);
             cpu.sp -= secondParam;
             for(int i = 0; i < secondParam; i++){
                 cpu.mem[intIn + i] = cpu.mem[cpu.sp + i];
@@ -1153,7 +1153,7 @@ void readBinary(FILE* f){
         cpu.mem[nextMem] = binary;
         nextMem++;
     }
-    while(cpu.pc < HEAP_START && cpu.pc >= 0 && cpu.sp < MEM_SIZE && cpu.sp >= STACK_START){
+    while(cpu.pc < MEM_SIZE && cpu.pc >= 0 && cpu.sp < MEM_SIZE && cpu.sp >= 0){
         uint8_t opcode = cpu.mem[cpu.pc];
         int64_t intIn = 0;
         int8_t secondParam = 0;
