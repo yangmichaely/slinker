@@ -1193,11 +1193,11 @@ void readBinary(FILE* f){
             case 142:
                 exit(0);
         }
-        printf("ITERATION START\n");
-        printf("opcode: %d\n", opcode);
-        printf("intIn: %ld\n", intIn);
-        printf("secondParam: %d\n", secondParam);
-        printf("floatIn: %f\n", floatIn);
+        // printf("ITERATION START\n");
+        // printf("opcode: %d\n", opcode);
+        // printf("intIn: %ld\n", intIn);
+        // printf("secondParam: %d\n", secondParam);
+        // printf("floatIn: %f\n", floatIn);
         interpret(opcode, intIn, floatIn, secondParam);
     }
     EXIT_ERROR();
