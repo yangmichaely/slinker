@@ -100,8 +100,8 @@ int64_t readMem(int numRead, int ind, int codeHeapStack){
         stackCheck(ind + numRead - 1);
     }
     int64_t ans = 0;
-    for(int i = numRead - 1; i >= 0; i--){
-        ans |= cpu.mem[ind + i] << ((numRead - 1 - i) * 8);
+    for(int i = ind; i < ind + numRead; i++){
+        ans = (ans << 8) | cpu.mem[i];
     }
     return ans;
 }
@@ -277,7 +277,7 @@ void interpret(uint8_t opcode, int64_t intIn, double floatIn, int8_t secondParam
         case 9:
             val64 = readMem(8, intIn, 1);
             writeStackVal(8, cpu.sp, val64);
-            cpu.sp += 1;
+            cpu.sp += 8;
             cpu.pc += 4;
             break;
         case 10:
