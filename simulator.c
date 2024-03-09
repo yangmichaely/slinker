@@ -345,7 +345,7 @@ void interpret(uint8_t opcode, int64_t intIn, double floatIn, int8_t secondParam
         case 29:
             valFloat = readMemFloat(4, cpu.sp - 4);
             val32 = *((int32_t*)&valFloat);
-            writeHeapVal(8, intIn, val32);
+            writeHeapVal(4, intIn, val32);
             //writeStackVal(8, cpu.sp - 8, 0);
             cpu.sp -= 4;
             cpu.pc += 4;
