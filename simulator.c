@@ -116,7 +116,7 @@ float readMemFloat(int numRead, int ind, int codeHeapStack){
     else{
         stackCheck(ind + numRead - 1);
     }
-    int32_t ans = 0;
+    uint32_t ans = 0;
     for(int i = ind; i < ind + numRead; i++){
         ans = (ans << 8) | cpu.mem[i];
     }
@@ -214,7 +214,7 @@ double doubleCheck(char* in){
 void interpret(uint8_t opcode, uint64_t intIn, double floatIn, int8_t secondParam){
     int8_t val8;
     int16_t val16;
-    int32_t val32;
+    int32_t val32 = 0;
     int64_t val64;
     double valDouble;
     float valFloat;
@@ -242,7 +242,8 @@ void interpret(uint8_t opcode, uint64_t intIn, double floatIn, int8_t secondPara
             cpu.pc += 9;
             break;
         case 4:
-            val32 = *((int32_t*)&floatIn);
+            valFloat = (float) floatIn;
+            val32 =  *((int32_t*)&valFloat);
             writeStackVal(4, cpu.sp, val32);
             cpu.sp += 4;
             cpu.pc += 5;
@@ -1147,8 +1148,8 @@ void readBinary(FILE* f){
                 intIn = readMem(8, cpu.pc + 1, 0);
                 break;
             case 4:
-                intIn = readMem(4, cpu.pc + 1, 0);
-                floatIn = *((float*)&intIn);
+                floatIn = readMemFloat(4, cpu.pc + 1, 0);
+                //floatIn = *((float*)&intIn);
                 break;
             case 5:
                 intIn = readMem(8, cpu.pc + 1, 0);

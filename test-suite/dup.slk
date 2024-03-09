@@ -1,0 +1,5 @@
+.code
+	pushf 1.1
+	dupf
+	outf
+	halt
