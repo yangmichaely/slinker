@@ -283,7 +283,7 @@ void interpret(uint8_t opcode, int64_t intIn, double floatIn, int8_t secondParam
             break;
         case 18:
             valDouble = readMemDouble(8, cpu.sp - 8);
-            val64 = *((int64_t*)&valFloat);
+            val64 = *((int64_t*)&valDouble);
             writeStackVal(8, cpu.sp, val64);
             cpu.sp += 8;
             cpu.pc++;
