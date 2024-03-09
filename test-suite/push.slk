@@ -1,10 +1,10 @@
 .code
-	pushdm :N0
-	pushd -128
-	popdm :N0
-	outb
+	pushf -3.4028235e+38
+	pushfm :N0
+	popfm :N0
+	outf
 	halt
 .data
 .byte
 :N0
-	-50
+	-51

@@ -117,7 +117,7 @@ float readMemFloat(int numRead, int ind, int codeHeapStack){
     else{
         stackCheck(ind + numRead - 1);
     }
-    uint32_t ans = 0;
+    int32_t ans = 0;
     for(int i = ind; i < ind + numRead; i++){
         ans = (ans << 8) | cpu.mem[i];
     }
