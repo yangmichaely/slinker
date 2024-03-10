@@ -1,0 +1,3 @@
+.code
+    pushb 1
+    not8

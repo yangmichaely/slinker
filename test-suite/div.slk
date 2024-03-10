@@ -1,6 +1,6 @@
 .code
 	pushb -128
-	pushb 0
+	pushb 23
 	divb
 	outb
 	halt

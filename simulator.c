@@ -949,23 +949,23 @@ void interpret(uint8_t opcode, int64_t intIn, double floatIn, int8_t secondParam
             cpu.pc++;
             break;
         case 119:
-            val8 = ~readMem(1, cpu.sp - 2);
-            writeStackVal(1, cpu.sp - 2, val8);
+            val8 = ~readMem(1, cpu.sp - 1);
+            writeStackVal(1, cpu.sp - 1, val8);
             cpu.pc++;
             break;
         case 120:
-            val16 = ~readMem(2, cpu.sp - 4);
-            writeStackVal(2, cpu.sp - 4, val16);
+            val16 = ~readMem(2, cpu.sp - 2);
+            writeStackVal(2, cpu.sp - 2, val16);
             cpu.pc++;
             break;
         case 121:
-            val32 = ~readMem(4, cpu.sp - 8);
-            writeStackVal(4, cpu.sp - 8, val32);
+            val32 = ~readMem(4, cpu.sp - 4);
+            writeStackVal(4, cpu.sp - 4, val32);
             cpu.pc++;
             break;
         case 122:
-            val64 = ~readMem(8, cpu.sp - 16);
-            writeStackVal(8, cpu.sp - 16, val64);
+            val64 = ~readMem(8, cpu.sp - 8);
+            writeStackVal(8, cpu.sp - 8, val64);
             cpu.pc++;
             break;
         case 123:
