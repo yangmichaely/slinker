@@ -728,7 +728,7 @@ void interpret(uint8_t opcode, int64_t intIn, double floatIn, int8_t secondParam
             cpu.pc++;
             break;
         case 85:
-            val32 = readMem(8, cpu.sp - 4) + readMem(8, cpu.sp - 8);
+            val32 = readMem(4, cpu.sp - 4) + readMem(4, cpu.sp - 8);
             writeStackVal(4, cpu.sp - 8, val32);
             cpu.sp -= 4;
             cpu.pc++;
@@ -740,7 +740,7 @@ void interpret(uint8_t opcode, int64_t intIn, double floatIn, int8_t secondParam
             cpu.pc++;
             break;
         case 87:
-            valFloat = readMemFloat(8, cpu.sp - 4) + readMemFloat(8, cpu.sp - 8);
+            valFloat = readMemFloat(4, cpu.sp - 4) + readMemFloat(4, cpu.sp - 8);
             val32 = *((int32_t*) &valFloat);
             writeStackVal(4, cpu.sp - 8, val32);
             cpu.sp -= 4;
