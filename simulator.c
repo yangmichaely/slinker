@@ -975,12 +975,14 @@ void interpret(uint8_t opcode, int64_t intIn, double floatIn, int8_t secondParam
             cpu.pc += 2;
             break;
         case 124:
-            val16 = readMem(2, cpu.sp - 2) >> intIn;
+            val16 = readMem(2, cpu.sp - 2);
+            val16 >>= intIn;
             writeStackVal(2, cpu.sp - 2, val16);
             cpu.pc += 2;
             break;
         case 125:
-            val32 = readMem(4, cpu.sp - 4) >> intIn;
+            val32 = readMem(4, cpu.sp - 4);
+            val32 >>= intIn;
             writeStackVal(4, cpu.sp - 4, val32);
             cpu.pc += 2;
             break;
