@@ -1,1 +1,9 @@
-lol hello
+My testing suite contains around 40 input files - 2 for each test case (a .slk file and a .slko file).
+
+For the assembler, created several .slk files for basic testing. Most of these .slk files consist 
+of 1-2 lines of code that test each individual instruction. Furthermore, I can modify these files
+as I please in order to check for edge cases, invalid cases, and valid cases.
+
+Finally, for the simulator, I execute the simulator on each .slko file that was created by the assembler.
+In this way I can use blackbox testing to manually check the output of the simulator on each .slko file.
+Once again, I can modify the .slk file in order to test the output produced by the .slko file.
