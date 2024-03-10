@@ -35,8 +35,6 @@ int search(char* name);
 
 void freeList(addr* head);
 
-void displayList();
-
 void EXIT_ERROR(int line);
 
 void byteCheck(int num, int line);

@@ -289,54 +289,42 @@ void interpret(uint8_t opcode, int64_t intIn, double floatIn, int8_t secondParam
             cpu.pc++;
             break;
         case 19:
-            //writeStackVal(1, cpu.sp - 1, 0);
             cpu.sp--;
             cpu.pc++;
             break;
         case 20:
-            //writeStackVal(2, cpu.sp - 2, 0);
             cpu.sp -= 2;
             cpu.pc++;
             break;
         case 21:
         case 23:
-            //writeStackVal(4, cpu.sp - 4, 0);
             cpu.sp -= 4;
             cpu.pc++;
             break;
         case 22:
         case 24:
-            //writeStackVal(8, cpu.sp - 8, 0);
             cpu.sp -= 8;
             cpu.pc++;
             break;
         case 25:
             val8 = readMem(1, cpu.sp - 1);
             writeHeapVal(1, intIn, val8);
-            //writeStackMem(1, intIn, cpu.sp - 1, 1, 1);
-            //writeStackVal(1, cpu.sp - 1, 0);
             cpu.sp--;
             cpu.pc += 4;
             break;
         case 26:
-            //writeStackMem(2, intIn, cpu.sp - 2, 1, 1);
-            //writeStackVal(2, cpu.sp - 2, 0);
             val16 = readMem(2, cpu.sp - 2);
             writeHeapVal(2, intIn, val16);
             cpu.sp -= 2;
             cpu.pc += 4;
             break;
         case 27:
-            //writeStackMem(4, intIn, cpu.sp - 4, 1, 1);
-            //writeStackVal(4, cpu.sp - 4, 0);
             val32 = readMem(4, cpu.sp - 4);
             writeHeapVal(4, intIn, val32);
             cpu.sp -= 4;
             cpu.pc += 4;
             break;
         case 28:
-            //writeStackMem(8, intIn, cpu.sp - 8, 1, 1);
-            //writeStackVal(8, cpu.sp - 8, 0);
             val64 = readMem(8, cpu.sp - 8);
             writeHeapVal(8, intIn, val64);
             cpu.sp -= 8;
@@ -346,7 +334,6 @@ void interpret(uint8_t opcode, int64_t intIn, double floatIn, int8_t secondParam
             valFloat = readMemFloat(4, cpu.sp - 4);
             val32 = *((int32_t*)&valFloat);
             writeHeapVal(4, intIn, val32);
-            //writeStackVal(8, cpu.sp - 8, 0);
             cpu.sp -= 4;
             cpu.pc += 4;
             break;
@@ -354,7 +341,6 @@ void interpret(uint8_t opcode, int64_t intIn, double floatIn, int8_t secondParam
             valDouble = readMemDouble(8, cpu.sp - 8);
             val64 = *((int64_t*)&valDouble);
             writeHeapVal(8, intIn, val64);
-            //writeStackVal(8, cpu.sp - 8, 0);
             cpu.sp -= 8;
             cpu.pc += 4;
             break;
@@ -617,7 +603,6 @@ void interpret(uint8_t opcode, int64_t intIn, double floatIn, int8_t secondParam
             cpu.sp -= 4;
             cpu.pc++;
             break;
-        //TODO: bounds checking for input
         case 69:
             scanf("%s", in);
             if(strlen(in) != 2){
@@ -714,7 +699,6 @@ void interpret(uint8_t opcode, int64_t intIn, double floatIn, int8_t secondParam
             cpu.sp -= 8;
             cpu.pc++;
             break;
-        //TODO: Check for overflow
         case 83:
             val8 = readMem(1, cpu.sp - 1) + readMem(1, cpu.sp - 2);
             writeStackVal(1, cpu.sp - 2, val8);
@@ -1155,11 +1139,6 @@ void readBinary(FILE* f){
             case 142:
                 exit(0);
         }
-        // printf("ITERATION START\n");
-        // printf("opcode: %d\n", opcode);
-        // printf("intIn: %ld\n", intIn);
-        // printf("secondParam: %d\n", secondParam);
-        // printf("floatIn: %f\n", floatIn);
         interpret(opcode, intIn, floatIn, secondParam);
     }
     EXIT_ERROR();

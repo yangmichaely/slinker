@@ -27,7 +27,6 @@ int main(int argc, char** argv){
         exit(1);
     }
     firstPass(fp);
-    // displayList();
     char* outFile = (char*) calloc(sizeof(char) * strlen(argv[1]) + 2, 1);
     for(int i = 0; i < strlen(argv[1]); i++){
         outFile[i] = argv[1][i];
@@ -78,20 +77,6 @@ void freeList(addr* listHead){
         free(tmp -> name);
         free(tmp);
     }
-}
-
-void displayList() {
-   addr* temp;
-   if (listHead == NULL) {
-      printf("List is empty.\n");
-      return;
-   }
-   printf("elements of list are :\n");
-   temp = listHead;
-   while (temp != NULL) {
-      printf("name: %s     address: %d\n", temp->name, temp->address);
-      temp = temp->next;
-   }
 }
 
 void EXIT_ERROR(int line){
@@ -147,7 +132,6 @@ void checkValid(int cmdNum, char* cmdParams, int emptyParams, int line){
                 EXIT_ERROR(line);
             }
             break;
-        //SHFT, PUSHB, JRPC
         case 0:
         case 123 ... 130:
         case 132:
@@ -212,7 +196,6 @@ void checkValid(int cmdNum, char* cmdParams, int emptyParams, int line){
                 EXIT_ERROR(line);
             }
             break;
-        //POP, PUSH, JMP, JZ...etc, CALL memory cases
         case 6 ... 11:
         case 25 ... 30:
         case 131:
@@ -223,7 +206,6 @@ void checkValid(int cmdNum, char* cmdParams, int emptyParams, int line){
                 EXIT_ERROR(line);
             }
             break;
-        //PUSHMM, POPMM
         case 12:
         case 31:
             regcomp(&regex, VALID_PARAMETERS[3], REG_EXTENDED);
@@ -282,8 +264,6 @@ void firstPass(FILE* fp){
         }
     }
     rewind(fp);
-    //Data types: byte, ascii, short, int, long, float, double
-    //code = 0, data = 1
     int codeOrData = 1;
     int directives = 0;
     int emptyParams = 0;
@@ -348,7 +328,6 @@ void firstPass(FILE* fp){
                 checkValid(cmdNum, cmdParams, emptyParams, i);
                 if(emptyParams == 0){
                     switch(cmdNum){
-                        //PUSH CASES
                         case 0:
                             codeMem += 2;
                             break;
@@ -369,18 +348,15 @@ void firstPass(FILE* fp){
                         case 12:
                             codeMem += 5;
                             break;
-                        //POP CASES
                         case 25 ... 30:
                             codeMem += 4;
                             break;
                         case 31:
                             codeMem += 5;
                             break;
-                        //SHFT CASES
                         case 123 ... 130:
                             codeMem += 2;
                             break;
-                        //JMP CASES
                         case 131:
                             codeMem += 4;
                             break;
@@ -390,7 +366,6 @@ void firstPass(FILE* fp){
                         case 134 ... 139:
                             codeMem += 4;
                             break;
-                        //CALL CASE
                         case 140:
                             codeMem += 4;
                             break;
@@ -495,7 +470,6 @@ void firstPass(FILE* fp){
 void readCode(FILE* fp, FILE* out, char* outfile){
     rewind(fp);
     fseek(out, 8, SEEK_SET);
-    //code, data, byte, ascii, short, int, long, float, double
     int codeOrData = 1;
     for(int i = 0; i < lines; i++){
         char* buffer = (char*) calloc (512 * sizeof(char), 1);
@@ -695,7 +669,6 @@ int splitter(char* cmdParams, uint8_t cmdNum, FILE* out){
 void readData(FILE* fp, FILE* out){
     fseek(out, dataStart >> 24, SEEK_SET);
     rewind(fp);
-    //code, data, byte, ascii, short, int, long, float, double
     int codeOrData = 1;
     int directives = 0;
     for(int i = 0; i < lines; i++){
