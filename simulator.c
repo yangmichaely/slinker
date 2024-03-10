@@ -969,7 +969,8 @@ void interpret(uint8_t opcode, int64_t intIn, double floatIn, int8_t secondParam
             cpu.pc++;
             break;
         case 123:
-            val8 = readMem(1, cpu.sp - 1) >> intIn;
+            val8 = readMem(1, cpu.sp - 1);
+            val8 >>= intIn;
             writeStackVal(1, cpu.sp - 1, val8);
             cpu.pc += 2;
             break;
