@@ -414,8 +414,8 @@ void interpret(uint8_t opcode, int64_t intIn, double floatIn, int8_t secondParam
             cpu.pc++;
             break;
         case 38:
-            val16 = (int16_t) readMem(1, cpu.sp - 1);
-            writeStackVal(2, cpu.sp - 1, val16);
+            val8 = readMem(1, cpu.sp - 1);
+            writeStackVal(2, cpu.sp - 1, (int16_t) val8);
             cpu.sp++;
             cpu.pc++;
             break;
