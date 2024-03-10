@@ -414,21 +414,20 @@ void interpret(uint8_t opcode, int64_t intIn, double floatIn, int8_t secondParam
             cpu.pc++;
             break;
         case 38:
-            val64 = readMem(1, cpu.sp - 1);
-            val8 = *((int8_t*)&val64);
+            val8 = readMem(1, cpu.sp - 1);
             writeStackVal(2, cpu.sp - 1, (int16_t) val8);
             cpu.sp++;
             cpu.pc++;
             break;
         case 39:
-            val32 = (int32_t) readMem(1, cpu.sp - 1);
-            writeStackVal(4, cpu.sp - 1, val32);
+            val8 = readMem(1, cpu.sp - 1);
+            writeStackVal(4, cpu.sp - 1, (int32_t) val8);
             cpu.sp += 3;
             cpu.pc++;
             break;
         case 40:
-            val64 = (int64_t) readMem(1, cpu.sp - 1);
-            writeStackVal(8, cpu.sp - 1, val64);
+            val8 = readMem(1, cpu.sp - 1);
+            writeStackVal(8, cpu.sp - 1, (int64_t) val8);
             cpu.sp += 7;
             cpu.pc++;
             break;

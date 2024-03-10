@@ -1,8 +1,8 @@
 .code
 	pushb -128
-	convbd
+	convbi
+	outi
 	pushb 127
-	convbd
-	addd
-	outd
+	convbl
+	outl
 	halt
