@@ -165,6 +165,8 @@ void interpret(uint8_t opcode, int64_t intIn, double floatIn, int8_t secondParam
     double valDouble;
     float valFloat;
     char valChar;
+    int8_t tmp8;
+    int16_t tmp16;
     int32_t tmp32;
     int64_t tmp64;
     char* in = (char*) calloc (sizeof(char) * 50, 1);
@@ -355,14 +357,14 @@ void interpret(uint8_t opcode, int64_t intIn, double floatIn, int8_t secondParam
             break;
         case 32:
             val8 = readMem(1, cpu.sp - 1);
-            int8_t tmp8 = readMem(1, cpu.sp - 2);
+            tmp8 = readMem(1, cpu.sp - 2);
             writeStackVal(1, cpu.sp - 2, val8);
             writeStackVal(1, cpu.sp - 1, tmp8);
             cpu.pc++;
             break;
         case 33:
             val16 = readMem(2, cpu.sp - 2);
-            int16_t tmp16 = readMem(2, cpu.sp - 4);
+            tmp16 = readMem(2, cpu.sp - 4);
             writeStackVal(2, cpu.sp - 4, val16);
             writeStackVal(2, cpu.sp - 2, tmp16);
             cpu.pc++;
