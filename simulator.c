@@ -830,18 +830,27 @@ void interpret(uint8_t opcode, int64_t intIn, double floatIn, int8_t secondParam
             cpu.pc++;
             break;
         case 101:
+            if(readMem(1, cpu.sp - 1) == 0){
+                EXIT_ERROR();
+            }
             val8 = readMem(1, cpu.sp - 2) / readMem(1, cpu.sp - 1);
             writeStackVal(1, cpu.sp - 2, val8);
             cpu.sp--;
             cpu.pc++;
             break;
         case 102:
+            if(readMem(2, cpu.sp - 2) == 0){
+                EXIT_ERROR();
+            }
             val16 = readMem(2, cpu.sp - 4) / readMem(2, cpu.sp - 2);
             writeStackVal(2, cpu.sp - 4, val16);
             cpu.sp -= 2;
             cpu.pc++;
             break;
         case 103:
+            if(readMem(4, cpu.sp - 4) == 0){
+                EXIT_ERROR();
+            }
             val32 = readMem(4, cpu.sp - 8) / readMem(4, cpu.sp - 4);
             writeStackVal(4, cpu.sp - 8, val32);
             cpu.sp -= 4;

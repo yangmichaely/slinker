@@ -1,0 +1,6 @@
+.code
+	pushb -128
+	pushb 0
+	divb
+	outb
+	halt
