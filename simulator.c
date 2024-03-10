@@ -1076,13 +1076,13 @@ void interpret(uint8_t opcode, int64_t intIn, double floatIn, int8_t secondParam
             }
             break;
         case 140:
-            writeStackVal(8, cpu.sp, cpu.pc + 4);
+            writeStackVal(4, cpu.sp, cpu.pc + 4);
             cpu.sp += 4;
             cpu.pc = intIn;
             break;
         case 141:
             cpu.sp -= 4;
-            cpu.pc = readMem(8, cpu.sp);
+            cpu.pc = readMem(4, cpu.sp);
             break;
     }
 }

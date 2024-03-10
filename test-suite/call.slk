@@ -1,0 +1,4 @@
+.code
+    call
+    return
+    halt

@@ -1,0 +1,5 @@
+.code
+	pushb -128
+	shftrb -128
+	outb
+	halt
