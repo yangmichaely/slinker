@@ -832,19 +832,32 @@ void interpret(uint8_t opcode, int64_t intIn, double floatIn, int8_t secondParam
         case 101:
             val8 = readMem(1, cpu.sp - 2);
             tmp8 = readMem(1, cpu.sp - 1);
+            if(tmp8 == 0){
+                EXIT_ERROR();
+            }
             val8 /= tmp8;
             writeStackVal(1, cpu.sp - 2, val8);
             cpu.sp--;
             cpu.pc++;
             break;
         case 102:
-            val16 = readMem(2, cpu.sp - 4) / readMem(2, cpu.sp - 2);
+            val16 = readMem(2, cpu.sp - 4);
+            tmp16 = readMem(2, cpu.sp - 2);
+            if(tmp16 == 0){
+                EXIT_ERROR();
+            }
+            val16 /= tmp16;
             writeStackVal(2, cpu.sp - 4, val16);
             cpu.sp -= 2;
             cpu.pc++;
             break;
         case 103:
-            val32 = readMem(4, cpu.sp - 8) / readMem(4, cpu.sp - 4);
+            val32 = readMem(4, cpu.sp - 8);
+            tmp32 = readMem(4, cpu.sp - 4);
+            if(tmp32 == 0){
+                EXIT_ERROR();
+            }
+            val32 /= tmp32;
             writeStackVal(4, cpu.sp - 8, val32);
             cpu.sp -= 4;
             cpu.pc++;
